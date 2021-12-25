@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "python-env"
+version = "0.1.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+black = "^19.10b0"
+pylint = "^2.5"
+isort = "^5.9.3"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+main = "src.main:main"
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint]
+disable = [
+    # blackとの競合回避 https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#pylint
+    "C0330", "C0326", "C0326",
+    # pydoc未記載の警告無視
+    "C0114", "C0115", "C0116",
+]
+max-line-length = 88
