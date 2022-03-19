@@ -8,10 +8,10 @@ authors = []
 python = "^3.9"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-black = "^19.10b0"
-pylint = "^2.5"
-isort = "^5.9.3"
+pytest = "^7.1.1"
+black = "^22.1.0"
+pylint = "^2.12.2"
+isort = "^5.10.1"
 mypy = "^0.941"
 
 [build-system]
