@@ -14,16 +14,17 @@ isort
 blackとの競合をpyproject.tomlの設定で解消
 
 # type check
+mypy
 pylance (VSCode Extention)
 
 # test
 pytest
 
+# doc
+google doc styleを採用
+
 # IDE
 VSCodeを利用する
-## Settings
-.vscode/settings.json に記載
 
-## Extention
-- python 
-- pylance
+## Settings
+.vscodeに記載

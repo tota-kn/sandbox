@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="serverless-flamerok-go">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.serverless/serverless-flamerok-go.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
