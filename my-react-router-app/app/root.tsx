@@ -7,14 +7,31 @@ import {
   isRouteErrorResponse,
 } from "react-router";
 import type { Route } from "./+types/root";
-
 import appStylesHref from "./app.css?url";
+import { getContacts } from "./data";
 
-export default function App() {
+export function HydrateFallback() {
+  return (
+    <div id="loading-splash">
+      <div id="loading-splash-spinner" />
+      <p>Loading, please wait...</p>
+    </div>
+  );
+}
+
+export async function clientLoader() {
+  const contacts = await getContacts();
+  return { contacts };
+}
+
+export default function App({ loaderData }: Route.ComponentProps) {
+  const { contacts } = loaderData;
   return (
     <>
       <div id="sidebar">
-        <h1>React Router Contacts</h1>
+        <h1>
+          <Link to="about">React Router Contacts</Link>
+        </h1>
         <div>
           <Form id="search-form" role="search">
             <input
@@ -31,18 +48,32 @@ export default function App() {
           </Form>
         </div>
         <nav>
-          <ul>
-            <li>
-              <Link to={`/contacts/1`}>Your Name</Link>
-            </li>
-            <li>
-              <Link to={`/contacts/2`}>Your Friend</Link>
-            </li>
-          </ul>
+          {contacts.length ? (
+            <ul>
+              {contacts.map((contact) => (
+                <li key={contact.id}>
+                  <Link to={`contacts/${contact.id}`}>
+                    {contact.first || contact.last ? (
+                      <>
+                        {contact.first} {contact.last}
+                      </>
+                    ) : (
+                      <i>No Name</i>
+                    )}
+                    {contact.favorite ? <span>★</span> : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              <i>No contacts</i>
+            </p>
+          )}
         </nav>
       </div>
       <div id="detail">
-        <Outlet/>
+        <Outlet />
       </div>
     </>
   );
