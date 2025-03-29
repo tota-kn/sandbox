@@ -116,9 +116,9 @@ const flattenBookmarks = (bookmarkItems: Bookmark[]): Bookmark[] => {
 
 // タイトルからタグを抽出する関数（@タグ形式）
 const extractTags = (title: string): string[] => {
-  const tagRegex = /@(\w+)/g
+  const tagRegex = /(?:^|\s)(@[^\s]+)/g
   const matches = [...title.matchAll(tagRegex)]
-  return matches.map(match => match[0])
+  return matches.map(match => match[1])
 }
 
 // フィルタリングされたブックマーク
