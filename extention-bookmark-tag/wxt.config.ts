@@ -9,7 +9,7 @@ export default defineConfig({
     permissions: ['bookmarks'],
     options_ui: {
       page: 'options/index.html',
-      open_in_tab: true
+      // open_in_tab: true
     }
   },
   vite: () => ({
