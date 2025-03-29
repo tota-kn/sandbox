@@ -1,7 +1,74 @@
-# WXT + Vue 3
+# ブックマークタグ管理拡張機能
 
-This template should help get you started developing with Vue 3 in WXT.
+Chrome拡張機能で、ブックマークにタグを付与して効率的に管理するためのツールです。
 
-## Recommended IDE Setup
+## 機能概要
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
+- ブックマーク名に含まれる `@tag` 形式のテキストを自動的にタグとして認識
+- 一つのブックマークに複数のタグを付与可能 (例: `Webサイト @tech @reference`)
+- タグによるブックマークのフィルタリング表示
+- タグ一覧の表示と管理
+
+## 技術スタック
+
+- **WXT**: Vue用の拡張機能開発フレームワーク
+- **Vue 3**: UIコンポーネント構築
+- **Chrome Extension API**: ブックマークの操作
+
+## インターフェース
+
+- **オプションページ**: 
+  - ブックマーク一覧表示
+  - タグによるフィルタリング
+  - タグ管理（一覧・統計など）
+
+## システム設計
+
+### データフロー
+
+1. **ブックマーク読み込み**
+   - Chrome Bookmarks APIを使用してブックマーク情報を取得
+   - ブックマーク名から @tag パターンを抽出
+
+2. **タグ管理システム**
+   - タグクラウド/一覧表示
+   - タグクリックによるフィルタリング
+   - タグ使用統計
+
+3. **データ保存**
+   - Chrome Storage APIを使用してタグ情報を永続化
+   - ブックマークの変更時にタグ情報も同期
+
+### ファイル構成
+
+```
+bookmark-tag-extension
+├── src
+│   ├── components
+│   │   ├── App.vue             # メインアプリケーションコンポーネント
+│   │   ├── BookmarkList.vue    # ブックマーク一覧コンポーネント
+│   │   ├── TagCloud.vue        # タグ表示・フィルターコンポーネント
+│   │   └── BookmarkItem.vue    # 個別ブックマーク表示コンポーネント
+│   ├── stores
+│   │   └── bookmarks.ts        # ブックマークとタグの状態管理
+│   ├── utils
+│   │   ├── tagParser.ts        # @tag 形式のタグ抽出ロジック
+│   │   └── chromeApi.ts        # Chrome APIとのインタラクション
+│   ├── background
+│   │   └── index.ts            # バックグラウンドスクリプト
+│   ├── options
+│   │   ├── Options.vue         # オプションページコンポーネント
+│   │   └── index.html          # オプションページのエントリーポイント
+│   └── manifest.json           # 拡張機能マニフェスト
+├── wxt.config.ts
+└── その他設定ファイル
+```
+
+## 開発予定
+
+- [ ] プロジェクト初期設定
+- [ ] ブックマーク取得機能の実装
+- [ ] タグ抽出ロジックの実装
+- [ ] オプションページUI実装
+- [ ] タグフィルタリング機能の実装
+- [ ] データ永続化の実装
