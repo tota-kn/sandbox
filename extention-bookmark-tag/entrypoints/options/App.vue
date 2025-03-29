@@ -13,12 +13,23 @@
     
     <div class="tags-section">
       <h2>タグ一覧</h2>
+      <div class="filter-toggle">
+        <span>検索モード：</span>
+        <label class="radio-label">
+          <input type="radio" v-model="searchMode" value="or" />
+          <span>OR（いずれか含む）</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" v-model="searchMode" value="and" />
+          <span>AND（すべて含む）</span>
+        </label>
+      </div>
       <div class="tag-list">
         <span 
           v-for="tag in uniqueTags" 
           :key="tag"
-          @click="filterByTag(tag)" 
-          :class="['tag-badge', selectedTag === tag ? 'selected' : '']"
+          @click="toggleTag(tag)" 
+          :class="['tag-badge', selectedTags.includes(tag) ? 'selected' : '']"
         >
           {{ tag }}
         </span>
@@ -34,16 +45,20 @@
       <ul v-else class="bookmark-list">
         <li v-for="bookmark in filteredBookmarks" :key="bookmark.id" class="bookmark-item">
           <div class="bookmark-content">
-            <a :href="bookmark.url" target="_blank" class="bookmark-title">{{ bookmark.title }}</a>
-            <div class="bookmark-tags">
-              <span 
-                v-for="tag in extractTags(bookmark.title)" 
-                :key="tag" 
-                class="bookmark-tag"
-              >
-                {{ tag }}
-                <span class="tag-remove" @click.stop="removeTag(bookmark, tag)">×</span>
-              </span>
+            <div class="bookmark-title-container">
+              <a :href="bookmark.url" target="_blank" class="bookmark-title">{{ bookmark.title }}</a>
+            </div>
+            <div class="bookmark-tags-container">
+              <div class="bookmark-tags">
+                <span 
+                  v-for="tag in extractTags(bookmark.title)" 
+                  :key="tag" 
+                  class="bookmark-tag"
+                >
+                  {{ tag }}
+                  <span class="tag-remove" @click.stop="removeTag(bookmark, tag)">×</span>
+                </span>
+              </div>
               <div class="add-tag">
                 <input 
                   v-if="editingBookmarkId === bookmark.id" 
@@ -78,7 +93,8 @@ interface Bookmark {
 const bookmarks = ref<Bookmark[]>([])
 const loading = ref(true)
 const searchQuery = ref('')
-const selectedTag = ref('')
+const selectedTags = ref<string[]>([])
+const searchMode = ref<'and' | 'or'>('or')
 const editingBookmarkId = ref<string | null>(null)
 const newTag = ref('')
 const tagInput = ref<HTMLInputElement | null>(null)
@@ -121,6 +137,15 @@ const extractTags = (title: string): string[] => {
   return matches.map(match => match[1])
 }
 
+// タグを切り替える
+const toggleTag = (tag: string) => {
+  if (selectedTags.value.includes(tag)) {
+    selectedTags.value = selectedTags.value.filter(t => t !== tag)
+  } else {
+    selectedTags.value.push(tag)
+  }
+}
+
 // フィルタリングされたブックマーク
 const filteredBookmarks = computed(() => {
   let filtered = bookmarks.value
@@ -135,10 +160,18 @@ const filteredBookmarks = computed(() => {
   }
   
   // タグでフィルタリング
-  if (selectedTag.value) {
-    filtered = filtered.filter(bookmark => 
-      extractTags(bookmark.title).includes(selectedTag.value)
-    )
+  if (selectedTags.value.length > 0) {
+    filtered = filtered.filter(bookmark => {
+      const bookmarkTags = extractTags(bookmark.title)
+      
+      if (searchMode.value === 'or') {
+        // OR検索: 選択したタグのうち少なくとも1つが含まれている
+        return selectedTags.value.some(tag => bookmarkTags.includes(tag))
+      } else {
+        // AND検索: 選択したタグすべてが含まれている
+        return selectedTags.value.every(tag => bookmarkTags.includes(tag))
+      }
+    })
   }
   
   return filtered
@@ -149,15 +182,6 @@ const uniqueTags = computed(() => {
   const allTags = bookmarks.value.flatMap(bookmark => extractTags(bookmark.title))
   return [...new Set(allTags)]
 })
-
-// タグでフィルタリング
-const filterByTag = (tag: string) => {
-  if (selectedTag.value === tag) {
-    selectedTag.value = '' // 同じタグをクリックした場合はクリア
-  } else {
-    selectedTag.value = tag
-  }
-}
 
 // タグ編集を開始する
 const startTagEdit = async (bookmark: Bookmark) => {
@@ -212,8 +236,8 @@ const removeTag = async (bookmark: Bookmark, tagToRemove: string) => {
     bookmark.title = updatedTitle
     
     // 選択中のタグが削除された場合、フィルターをクリア
-    if (selectedTag.value === tagToRemove) {
-      selectedTag.value = ''
+    if (selectedTags.value.includes(tagToRemove)) {
+      selectedTags.value = selectedTags.value.filter(tag => tag !== tagToRemove)
     }
   } catch (error) {
     console.error('ブックマークの更新に失敗しました:', error)
@@ -254,6 +278,20 @@ h1 {
 
 .tags-section {
   margin-bottom: 20px;
+}
+
+.filter-toggle {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 }
 
 .tag-list {
@@ -297,8 +335,19 @@ h1 {
 
 .bookmark-content {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.bookmark-title-container {
+  flex: 1;
+  min-width: 200px;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bookmark-title {
@@ -311,11 +360,23 @@ h1 {
   text-decoration: underline;
 }
 
+.bookmark-tags-container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 200px;
+  max-width: 50%;
+}
+
 .bookmark-tags {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .bookmark-tag {
@@ -377,6 +438,6 @@ h1 {
   border-radius: 15px;
   padding: 2px 8px;
   font-size: 12px;
-  width: 100px;
+  width: 120px;
 }
 </style>
