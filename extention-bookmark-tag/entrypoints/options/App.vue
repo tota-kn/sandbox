@@ -40,10 +40,22 @@
                 v-for="tag in extractTags(bookmark.title)" 
                 :key="tag" 
                 class="bookmark-tag"
-                @click="filterByTag(tag)"
               >
                 {{ tag }}
+                <span class="tag-remove" @click.stop="removeTag(bookmark, tag)">×</span>
               </span>
+              <div class="add-tag">
+                <input 
+                  v-if="editingBookmarkId === bookmark.id" 
+                  v-model="newTag" 
+                  @keyup.enter="addTag(bookmark)" 
+                  placeholder="新しいタグ" 
+                  class="new-tag-input" 
+                  ref="tagInput"
+                  @blur="editingBookmarkId = null"
+                />
+                <button v-else @click="startTagEdit(bookmark)" class="add-tag-btn">+</button>
+              </div>
             </div>
           </div>
         </li>
@@ -53,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 
 // ブックマークの型定義
 interface Bookmark {
@@ -67,6 +79,9 @@ const bookmarks = ref<Bookmark[]>([])
 const loading = ref(true)
 const searchQuery = ref('')
 const selectedTag = ref('')
+const editingBookmarkId = ref<string | null>(null)
+const newTag = ref('')
+const tagInput = ref<HTMLInputElement | null>(null)
 
 // ブックマークを取得する関数
 const fetchBookmarks = async () => {
@@ -141,6 +156,67 @@ const filterByTag = (tag: string) => {
     selectedTag.value = '' // 同じタグをクリックした場合はクリア
   } else {
     selectedTag.value = tag
+  }
+}
+
+// タグ編集を開始する
+const startTagEdit = async (bookmark: Bookmark) => {
+  editingBookmarkId.value = bookmark.id
+  newTag.value = ''
+  await nextTick()
+  tagInput.value?.focus()
+}
+
+// タグを追加する
+const addTag = async (bookmark: Bookmark) => {
+  if (!newTag.value.trim()) {
+    editingBookmarkId.value = null
+    return
+  }
+  
+  const formattedTag = newTag.value.trim().startsWith('@') 
+    ? newTag.value.trim() 
+    : `@${newTag.value.trim()}`
+    
+  if (!extractTags(bookmark.title).includes(formattedTag)) {
+    // タグが存在しない場合のみ追加する
+    const updatedTitle = `${bookmark.title} ${formattedTag}`
+    
+    try {
+      await chrome.bookmarks.update(bookmark.id, {
+        title: updatedTitle
+      })
+      
+      // ローカルのブックマークデータを更新
+      bookmark.title = updatedTitle
+    } catch (error) {
+      console.error('ブックマークの更新に失敗しました:', error)
+    }
+  }
+  
+  newTag.value = ''
+  editingBookmarkId.value = null
+}
+
+// タグを削除する
+const removeTag = async (bookmark: Bookmark, tagToRemove: string) => {
+  // タイトルからタグを削除
+  const updatedTitle = bookmark.title.replace(tagToRemove, '').replace(/\s+/g, ' ').trim()
+  
+  try {
+    await chrome.bookmarks.update(bookmark.id, {
+      title: updatedTitle
+    })
+    
+    // ローカルのブックマークデータを更新
+    bookmark.title = updatedTitle
+    
+    // 選択中のタグが削除された場合、フィルターをクリア
+    if (selectedTag.value === tagToRemove) {
+      selectedTag.value = ''
+    }
+  } catch (error) {
+    console.error('ブックマークの更新に失敗しました:', error)
   }
 }
 
@@ -239,6 +315,7 @@ h1 {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .bookmark-tag {
@@ -247,7 +324,20 @@ h1 {
   padding: 2px 6px;
   border-radius: 10px;
   font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.tag-remove {
   cursor: pointer;
+  margin-left: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #666;
+}
+
+.tag-remove:hover {
+  color: #d32f2f;
 }
 
 .bookmark-tag:hover {
@@ -258,5 +348,35 @@ h1 {
   padding: 20px 0;
   color: #666;
   font-style: italic;
+}
+
+.add-tag {
+  display: inline-flex;
+  align-items: center;
+}
+
+.add-tag-btn {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.add-tag-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.new-tag-input {
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 2px 8px;
+  font-size: 12px;
+  width: 100px;
 }
 </style>
