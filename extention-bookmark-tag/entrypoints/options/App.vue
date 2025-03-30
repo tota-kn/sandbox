@@ -42,21 +42,7 @@
     
     <div class="mt-8">
       <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center gap-3">
-          <h2 class="text-xl font-semibold">Bookmark List</h2>
-          <!-- 表示モード切替 -->
-          <div class="flex items-center">
-            <button 
-              @click="toggleDisplayMode" 
-              class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1"
-              :class="{'bg-blue-100': showFolderStructure}"
-            >
-              <span v-if="showFolderStructure">🗂️</span>
-              <span v-else>📑</span>
-              {{ showFolderStructure ? 'Folder View' : 'Flat View' }}
-            </button>
-          </div>
-        </div>
+        <h2 class="text-xl font-semibold">Bookmark List</h2>
         
         <!-- バッチ編集モードボタン -->
         <div class="flex items-center gap-2">
@@ -95,32 +81,18 @@
       </div>
 
       <div v-if="loading" class="py-4">Loading...</div>
-      <div v-else-if="filteredBookmarks.length === 0 && !showFolderStructure" class="py-5 text-gray-500 italic">
+      <div v-else-if="filteredBookmarks.length === 0" class="py-5 text-gray-500 italic">
         No bookmarks to display
       </div>
       
       <!-- フォルダ構造表示 -->
       <FolderView 
-        v-if="showFolderStructure" 
-        :bookmarks="bookmarks" 
+        :bookmarks="filteredBookmarks" 
         @update-title="updateBookmarkTitle"
         @toggle-select="toggleBookmarkSelection"
         @toggle-folder-expanded="toggleFolderExpanded"
         @toggle-folder-selection="toggleFolderSelection"
       />
-      
-      <!-- フラットビュー表示 -->
-      <ul v-else class="list-none p-0">
-        <BookmarkItem 
-          v-for="bookmark in filteredBookmarks"
-          :key="bookmark.id"
-          :bookmark="bookmark"
-          :selectable="true"
-          :selected="bookmark.selected || false"
-          @update-title="updateBookmarkTitle"
-          @toggle-select="toggleBookmarkSelection(bookmark)"
-        />
-      </ul>
     </div>
   </div>
 </template>
@@ -148,8 +120,6 @@ const batchEditMode = ref(false)
 // バッチ編集用の新しいタグ
 const batchTagToAdd = ref('')
 const batchTagToRemove = ref('')
-// ディレクトリ表示モード
-const showFolderStructure = ref(true)
 
 // ブックマークを取得する関数
 const fetchBookmarks = async () => {
@@ -261,60 +231,28 @@ const filteredTags = computed(() => {
   )
 })
 
-// フォルダ構造表示用のブックマーク
-const folderStructureBookmarks = computed(() => {
-  if (!showFolderStructure.value) {
-    return filteredBookmarks.value
-  }
-  
-  // フォルダはそのまま表示
-  return bookmarks.value.filter(bookmark => {
-    // フォルダはそのまま表示
-    if (bookmark.isFolder) return true
-    
-    // 通常のブックマークはフィルタリング条件に従う
-    let include = true
-    
-    // 検索クエリでフィルタリング
-    if (bookmarkSearchQuery.value) {
-      const query = bookmarkSearchQuery.value.toLowerCase()
-      include = (bookmark.title?.toLowerCase().includes(query) || 
-                bookmark.url?.toLowerCase().includes(query)) ?? false
-    }
-    
-    // タグでフィルタリング
-    if (include && selectedTags.value.length > 0) {
-      const bookmarkTags = extractTags(bookmark.title || '')
-      
-      if (searchMode.value === 'or') {
-        // OR検索: 選択したタグのうち少なくとも1つが含まれている
-        include = selectedTags.value.some(tag => bookmarkTags.includes(tag))
-      } else {
-        // AND検索: 選択したタグすべてが含まれている
-        include = selectedTags.value.every(tag => bookmarkTags.includes(tag))
-      }
-    }
-    
-    return include
-  })
-})
-
 // フィルタリングされたブックマーク
 const filteredBookmarks = computed(() => {
-  let filtered = bookmarks.value.filter(bookmark => !bookmark.isFolder)
+  let filtered = bookmarks.value
   
   // 検索クエリでフィルタリング
   if (bookmarkSearchQuery.value) {
     const query = bookmarkSearchQuery.value.toLowerCase()
-    filtered = filtered.filter(bookmark => 
-      (bookmark.title?.toLowerCase().includes(query) || 
-       bookmark.url?.toLowerCase().includes(query)) ?? false
-    )
+    filtered = filtered.filter(bookmark => {
+      // フォルダはそのまま表示
+      if (bookmark.isFolder) return true
+      
+      return (bookmark.title?.toLowerCase().includes(query) || 
+              bookmark.url?.toLowerCase().includes(query)) ?? false
+    })
   }
   
   // タグでフィルタリング
   if (selectedTags.value.length > 0) {
     filtered = filtered.filter(bookmark => {
+      // フォルダはそのまま表示
+      if (bookmark.isFolder) return true
+      
       const bookmarkTags = extractTags(bookmark.title || '')
       
       if (searchMode.value === 'or') {
@@ -329,7 +267,6 @@ const filteredBookmarks = computed(() => {
   
   return filtered
 })
-
 // ブックマークのタイトルを更新する
 const updateBookmarkTitle = async (bookmarkId: string, newTitle: string) => {
   try {
@@ -422,10 +359,5 @@ const removeTagFromBatch = async (tagInput: string) => {
     console.error('タグの一括削除に失敗しました:', error)
     loading.value = false
   }
-}
-
-// 表示モードの切り替え
-const toggleDisplayMode = () => {
-  showFolderStructure.value = !showFolderStructure.value
 }
 </script>
