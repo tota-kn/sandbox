@@ -21,8 +21,7 @@
     <!-- サジェスト表示エリア -->
     <div 
       v-if="showSuggestions" 
-      class="absolute bg-white border border-gray-300 rounded-md mt-1 w-48 z-10 max-h-40 overflow-y-auto shadow-md"
-      :style="suggestionsPositionStyle"
+      class="absolute bg-white border border-gray-300 rounded-md mt-1 w-48 z-10 max-h-32 overflow-y-auto shadow-md top-full left-0"
     >
       <div 
         v-for="suggestion in tagSuggestions" 
