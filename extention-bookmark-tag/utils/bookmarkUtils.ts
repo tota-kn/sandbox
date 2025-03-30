@@ -226,7 +226,12 @@ export const getAllBookmarksInFolder = (
     let result: ExtendedBookmark[] = [];
 
     for (const child of children) {
-        if (child.isFolder) {
+        // 標準のBookmarkTreeNodeを ExtendedBookmark として扱う
+        const extendedChild: ExtendedBookmark = allBookmarks.length > 0
+            ? child
+            : { ...child, isFolder: !child.url };
+            
+        if (extendedChild.isFolder) {
             // フォルダの場合は自身を追加し、再帰的に子要素も取得
             result.push(child);
             result = [...result, ...getAllBookmarksInFolder(child, allBookmarks)];
