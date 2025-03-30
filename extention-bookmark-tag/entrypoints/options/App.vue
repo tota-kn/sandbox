@@ -3,15 +3,6 @@
     <h1 class="text-2xl font-bold text-gray-800 pb-3 mb-4 border-b-2 border-gray-100">ブックマークタグ管理</h1>
     
     <div class="mb-6">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
-        placeholder="タグまたはブックマーク名で検索" 
-        class="w-full p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
-    
-    <div class="mb-6">
       <div class="flex items-center mb-3">
         <h2 class="text-xl font-semibold mr-4">タグ一覧</h2>
         <div class="flex items-center gap-2">
@@ -26,9 +17,19 @@
           </label>
         </div>
       </div>
+
+      <!-- タグ検索ボックス -->
+      <div class="mb-3">
+        <SearchBox 
+          v-model="tagSearchQuery" 
+          placeholder="タグを検索..."
+        />
+      </div>
+
+      <!-- タグ一覧 -->
       <div class="flex flex-wrap gap-2">
         <TagBadge 
-          v-for="tag in uniqueTags" 
+          v-for="tag in filteredTags" 
           :key="tag"
           :tag="tag"
           :selected="selectedTags.includes(tag)"
@@ -41,6 +42,15 @@
     
     <div class="mt-8">
       <h2 class="text-xl font-semibold mb-3">ブックマーク一覧</h2>
+
+      <!-- ブックマーク検索ボックス -->
+      <div class="mb-3">
+        <SearchBox 
+          v-model="bookmarkSearchQuery" 
+          placeholder="タイトルまたはURLで検索..."
+        />
+      </div>
+
       <div v-if="loading" class="py-4">読み込み中...</div>
       <div v-else-if="filteredBookmarks.length === 0" class="py-5 text-gray-500 italic">
         表示するブックマークがありません
@@ -61,6 +71,7 @@
 import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
 import BookmarkItem from '../../components/BookmarkItem.vue'
+import SearchBox from '../../components/SearchBox.vue'
 
 // ブックマークの型定義
 interface Bookmark {
@@ -72,7 +83,8 @@ interface Bookmark {
 
 const bookmarks = ref<Bookmark[]>([])
 const loading = ref(true)
-const searchQuery = ref('')
+const bookmarkSearchQuery = ref('')
+const tagSearchQuery = ref('')
 const selectedTags = ref<string[]>([])
 const searchMode = ref<'and' | 'or'>('or')
 
@@ -155,13 +167,31 @@ const handleTagEdit = async (oldTag: string, newTag: string) => {
   }
 }
 
+// 全てのユニークなタグを抽出
+const uniqueTags = computed(() => {
+  const allTags = bookmarks.value.flatMap(bookmark => extractTags(bookmark.title))
+  return [...new Set(allTags)]
+})
+
+// タグ検索でフィルタリングしたタグリスト
+const filteredTags = computed(() => {
+  if (!tagSearchQuery.value) {
+    return uniqueTags.value
+  }
+  
+  const query = tagSearchQuery.value.toLowerCase()
+  return uniqueTags.value.filter(tag => 
+    tag.toLowerCase().includes(query)
+  )
+})
+
 // フィルタリングされたブックマーク
 const filteredBookmarks = computed(() => {
   let filtered = bookmarks.value
   
   // 検索クエリでフィルタリング
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
+  if (bookmarkSearchQuery.value) {
+    const query = bookmarkSearchQuery.value.toLowerCase()
     filtered = filtered.filter(bookmark => 
       bookmark.title.toLowerCase().includes(query) || 
       bookmark.url?.toLowerCase().includes(query)
@@ -184,12 +214,6 @@ const filteredBookmarks = computed(() => {
   }
   
   return filtered
-})
-
-// 全てのユニークなタグを抽出
-const uniqueTags = computed(() => {
-  const allTags = bookmarks.value.flatMap(bookmark => extractTags(bookmark.title))
-  return [...new Set(allTags)]
 })
 
 // ブックマークのタイトルを更新する
