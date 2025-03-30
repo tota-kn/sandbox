@@ -1,15 +1,18 @@
 <template>
   <span 
     @click="$emit('toggle')"
-    :class="['tag-badge', { 'selected': selected }]"
+    :class="[
+      ...commonClasses,
+      ...(props.selected ? selectedClasses : unselectedClasses)
+    ]"
   >
-    {{ tag }}
+    {{ props.tag }}
     <slot></slot>
   </span>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   tag: string;
   selected: boolean;
 }>();
@@ -17,28 +20,33 @@ defineProps<{
 defineEmits<{
   (e: 'toggle'): void;
 }>();
+
+// 共通スタイルクラス
+const commonClasses = [
+  'px-3',
+  'py-1',
+  'rounded-full',
+  'text-sm',
+  'cursor-pointer',
+  'transition-all',
+  'duration-200',
+  'inline-block'
+];
+
+// 選択時のスタイルクラス
+const selectedClasses = [
+  'bg-blue-500',
+  'text-white',
+  'border',
+  'border-blue-600'
+];
+
+// 非選択時のスタイルクラス
+const unselectedClasses = [
+  'bg-blue-100',
+  'text-blue-700',
+  'border',
+  'border-blue-200',
+  'hover:bg-blue-200'
+];
 </script>
-
-<style scoped>
-.tag-badge {
-  padding: 0.25rem 0.75rem !important;
-  border-radius: 9999px !important;
-  font-size: 0.875rem !important;
-  cursor: pointer !important;
-  transition: all 0.2s !important;
-  background-color: #dbeafe !important; /* 非選択時の水色背景 */
-  color: #1d4ed8 !important; /* 非選択時の文字色 */
-  border: 1px solid #bfdbfe !important;
-  display: inline-block !important;
-}
-
-.tag-badge:hover:not(.selected) {
-  background-color: #bfdbfe !important;
-}
-
-.tag-badge.selected {
-  background-color: #3b82f6 !important; /* 選択時の濃い水色背景 */
-  color: white !important;
-  border-color: #2563eb !important;
-}
-</style>

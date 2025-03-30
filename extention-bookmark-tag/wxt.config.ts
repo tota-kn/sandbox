@@ -16,7 +16,7 @@ export default defineConfig({
   vite: () => ({
     plugins: [
       vue(),
-      tailwindcss()
+      tailwindcss(),
     ],
   }),
 })
