@@ -1,5 +1,6 @@
 import { defineConfig } from 'wxt'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   manifest: {
@@ -15,6 +16,7 @@ export default defineConfig({
   vite: () => ({
     plugins: [
       vue(),
+      tailwindcss()
     ],
   }),
 })

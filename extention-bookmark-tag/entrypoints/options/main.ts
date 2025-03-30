@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import '../../assets/css/tailwind.css'
 
-// Vueアプリケーションを初期化
 createApp(App).mount('#app')

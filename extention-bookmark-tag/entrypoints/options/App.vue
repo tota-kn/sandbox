@@ -1,75 +1,84 @@
 <template>
-  <div class="options-container">
-    <h1>ブックマークタグ管理</h1>
+  <div class="max-w-3xl mx-auto p-5 font-sans">
+    <h1 class="text-2xl font-bold text-gray-800 pb-3 mb-4 border-b-2 border-gray-100">ブックマークタグ管理</h1>
     
-    <div class="filter-section">
+    <div class="mb-6">
       <input 
         type="text" 
         v-model="searchQuery" 
         placeholder="タグまたはブックマーク名で検索" 
-        class="search-input"
+        class="w-full p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </div>
     
-    <div class="tags-section">
-      <h2>タグ一覧</h2>
-      <div class="filter-toggle">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold mb-3">タグ一覧</h2>
+      <div class="flex items-center gap-3 mb-3">
         <span>検索モード：</span>
-        <label class="radio-label">
-          <input type="radio" v-model="searchMode" value="or" />
+        <label class="inline-flex items-center gap-1 cursor-pointer">
+          <input type="radio" v-model="searchMode" value="or" class="form-radio text-blue-600" />
           <span>OR（いずれか含む）</span>
         </label>
-        <label class="radio-label">
-          <input type="radio" v-model="searchMode" value="and" />
+        <label class="inline-flex items-center gap-1 cursor-pointer">
+          <input type="radio" v-model="searchMode" value="and" class="form-radio text-blue-600" />
           <span>AND（すべて含む）</span>
         </label>
       </div>
-      <div class="tag-list">
+      <div class="flex flex-wrap gap-2">
         <span 
           v-for="tag in uniqueTags" 
           :key="tag"
           @click="toggleTag(tag)" 
-          :class="['tag-badge', selectedTags.includes(tag) ? 'selected' : '']"
+          :class="[
+            'px-3 py-1 rounded-full text-sm cursor-pointer transition-colors',
+            selectedTags.includes(tag) 
+              ? 'bg-blue-500 text-white' 
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          ]"
         >
           {{ tag }}
         </span>
       </div>
     </div>
     
-    <div class="bookmarks-section">
-      <h2>ブックマーク一覧</h2>
-      <div v-if="loading">読み込み中...</div>
-      <div v-else-if="filteredBookmarks.length === 0" class="no-bookmarks">
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold mb-3">ブックマーク一覧</h2>
+      <div v-if="loading" class="py-4">読み込み中...</div>
+      <div v-else-if="filteredBookmarks.length === 0" class="py-5 text-gray-500 italic">
         表示するブックマークがありません
       </div>
-      <ul v-else class="bookmark-list">
-        <li v-for="bookmark in filteredBookmarks" :key="bookmark.id" class="bookmark-item">
-          <div class="bookmark-content">
-            <div class="bookmark-title-container">
-              <a :href="bookmark.url" target="_blank" class="bookmark-title">{{ bookmark.title }}</a>
+      <ul v-else class="list-none p-0">
+        <li v-for="bookmark in filteredBookmarks" :key="bookmark.id" class="py-3 border-b border-gray-100">
+          <div class="flex flex-col sm:flex-row justify-between gap-3 w-full">
+            <div class="flex-1 min-w-[200px] max-w-full sm:max-w-[50%] truncate">
+              <a :href="bookmark.url" target="_blank" class="text-blue-600 font-medium hover:underline">{{ bookmark.title }}</a>
             </div>
-            <div class="bookmark-tags-container">
-              <div class="bookmark-tags">
+            <div class="flex flex-row items-center justify-end gap-2 flex-1 min-w-[200px] max-w-full sm:max-w-[50%]">
+              <div class="flex flex-wrap gap-1 items-center justify-end">
                 <span 
                   v-for="tag in extractTags(bookmark.title)" 
                   :key="tag" 
-                  class="bookmark-tag"
+                  class="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-full flex items-center"
                 >
                   {{ tag }}
-                  <span class="tag-remove" @click.stop="removeTag(bookmark, tag)">×</span>
+                  <span class="cursor-pointer ml-1 font-bold text-gray-500 hover:text-red-600" @click.stop="removeTag(bookmark, tag)">×</span>
                 </span>
               </div>
-              <div class="add-tag">
+              <div class="inline-flex items-center">
                 <input 
                   v-if="editingBookmarkId === bookmark.id" 
                   v-model="newTag" 
                   @keyup.enter="addTag(bookmark)" 
                   placeholder="新しいタグ" 
-                  class="new-tag-input" 
+                  class="border border-gray-300 rounded-full text-xs p-1 px-2 w-28 focus:outline-none focus:ring-1 focus:ring-blue-500" 
                   ref="tagInput"
                   @blur="editingBookmarkId = null"
                 />
-                <button v-else @click="startTagEdit(bookmark)" class="add-tag-btn">+</button>
+                <button 
+                  v-else 
+                  @click="startTagEdit(bookmark)" 
+                  class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-sm"
+                >+</button>
               </div>
             </div>
           </div>
@@ -249,195 +258,3 @@ onMounted(() => {
   fetchBookmarks()
 })
 </script>
-
-<style scoped>
-.options-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-h1 {
-  color: #333;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
-}
-
-.filter-section {
-  margin-bottom: 20px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.tags-section {
-  margin-bottom: 20px;
-}
-
-.filter-toggle {
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.radio-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-}
-
-.tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag-badge {
-  background-color: #f0f0f0;
-  color: #333;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.tag-badge:hover {
-  background-color: #e0e0e0;
-}
-
-.tag-badge.selected {
-  background-color: #4a90e2;
-  color: white;
-}
-
-.bookmarks-section {
-  margin-top: 20px;
-}
-
-.bookmark-list {
-  list-style: none;
-  padding: 0;
-}
-
-.bookmark-item {
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.bookmark-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-}
-
-.bookmark-title-container {
-  flex: 1;
-  min-width: 200px;
-  max-width: 50%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bookmark-title {
-  color: #1a73e8;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.bookmark-title:hover {
-  text-decoration: underline;
-}
-
-.bookmark-tags-container {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  min-width: 200px;
-  max-width: 50%;
-}
-
-.bookmark-tags {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.bookmark-tag {
-  background-color: #e8f0fe;
-  color: #1a73e8;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-}
-
-.tag-remove {
-  cursor: pointer;
-  margin-left: 4px;
-  font-weight: bold;
-  font-size: 14px;
-  color: #666;
-}
-
-.tag-remove:hover {
-  color: #d32f2f;
-}
-
-.bookmark-tag:hover {
-  background-color: #d2e3fc;
-}
-
-.no-bookmarks {
-  padding: 20px 0;
-  color: #666;
-  font-style: italic;
-}
-
-.add-tag {
-  display: inline-flex;
-  align-items: center;
-}
-
-.add-tag-btn {
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.add-tag-btn:hover {
-  background-color: #e0e0e0;
-}
-
-.new-tag-input {
-  border: 1px solid #ddd;
-  border-radius: 15px;
-  padding: 2px 8px;
-  font-size: 12px;
-  width: 120px;
-}
-</style>
