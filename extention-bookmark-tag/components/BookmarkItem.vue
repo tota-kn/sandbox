@@ -1,34 +1,37 @@
 <template>
   <li class="py-3 border-b border-gray-100">
-    <div class="flex flex-col sm:flex-row justify-between gap-3 w-full">
-      <div class="flex-1 min-w-[200px] max-w-full sm:max-w-[50%] truncate">
-        <a :href="bookmark.url" target="_blank" class="text-blue-600 font-medium hover:underline">{{ bookmark.title }}</a>
-      </div>
-      <div class="flex flex-row items-center justify-end gap-2 flex-1 min-w-[200px] max-w-full sm:max-w-[50%]">
-        <div class="flex flex-wrap gap-1 items-center justify-end">
-          <TagBadge 
-            v-for="tag in extractTags(bookmark.title)" 
-            :key="tag"
-            :tag="tag"
-            :selected="false"
-          >
-            <span class="cursor-pointer ml-1 font-bold text-gray-500 hover:text-red-600" @click.stop="removeTag(tag)">×</span>
-          </TagBadge>
-        </div>
+    <div class="flex items-start">
+      <!-- ブックマークタイトルとタグを並べる親コンテナ -->
+      <div class="flex flex-wrap items-center gap-1">
+        <!-- ブックマークタイトル (タグを除去して表示) -->
+        <a :href="bookmark.url" target="_blank" class="text-blue-600 font-medium hover:underline mr-1">{{ displayTitle }}</a>
+        
+        <!-- タグ一覧 -->
+        <TagBadge 
+          v-for="tag in bookmarkTags" 
+          :key="tag"
+          :tag="tag"
+          :selected="false"
+          class="mr-1"
+        >
+          <span class="cursor-pointer ml-1 font-bold text-gray-500 hover:text-red-600" @click.stop="removeTag(tag)">×</span>
+        </TagBadge>
+        
+        <!-- タグ追加ボタン -->
         <div class="inline-flex items-center">
           <input 
             v-if="isEditing" 
             v-model="newTag" 
             @keyup.enter="addTag" 
             placeholder="新しいタグ" 
-            class="border border-gray-300 rounded-full text-xs p-1 px-2 w-28 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+            class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
             ref="tagInput"
             @blur="isEditing = false"
           />
           <button 
             v-else 
             @click="startTagEdit" 
-            class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-sm"
+            class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
           >+</button>
         </div>
       </div>
@@ -37,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, computed } from 'vue'
 import TagBadge from './TagBadge.vue'
 
 interface Bookmark {
@@ -65,6 +68,17 @@ const extractTags = (title: string): string[] => {
   return matches.map(match => match[1])
 }
 
+// ブックマークのタグ一覧を計算
+const bookmarkTags = computed(() => {
+  return extractTags(props.bookmark.title)
+})
+
+// タグを除去したタイトルを表示用に計算
+const displayTitle = computed(() => {
+  // すべてのタグ (@xxx 形式) を削除し、余分な空白を整理
+  return props.bookmark.title.replace(/\s?@[^\s]+\s?/g, ' ').trim()
+})
+
 // タグ編集を開始する
 const startTagEdit = async () => {
   isEditing.value = true
@@ -84,7 +98,7 @@ const addTag = async () => {
     ? newTag.value.trim() 
     : `@${newTag.value.trim()}`
     
-  if (!extractTags(props.bookmark.title).includes(formattedTag)) {
+  if (!bookmarkTags.value.includes(formattedTag)) {
     // タグが存在しない場合のみ追加する
     const updatedTitle = `${props.bookmark.title} ${formattedTag}`
     emit('updateTitle', props.bookmark.id, updatedTitle)
