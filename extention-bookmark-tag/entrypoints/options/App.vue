@@ -79,43 +79,12 @@
       </div>
 
       <!-- バッチ編集フォーム -->
-      <div v-if="batchEditMode" class="mb-4 p-4 bg-blue-50 rounded-md border border-blue-200">
-        <h3 class="font-medium mb-2 text-blue-800">Batch Tag Edit</h3>
-        
-        <div class="flex flex-col gap-3">
-          <!-- タグ追加 -->
-          <div class="flex items-center gap-2">
-            <input 
-              v-model="batchTagToAdd" 
-              placeholder="Tag to add..." 
-              class="px-3 py-2 border rounded flex-grow"
-            />
-            <button 
-              @click="addTagToBatch"
-              :disabled="!batchTagToAdd || selectedBookmarks.length === 0"
-              class="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-            >
-              Add Tag
-            </button>
-          </div>
-          
-          <!-- タグ削除 -->
-          <div class="flex items-center gap-2">
-            <input 
-              v-model="batchTagToRemove" 
-              placeholder="Tag to remove..." 
-              class="px-3 py-2 border rounded flex-grow"
-            />
-            <button 
-              @click="removeTagFromBatch"
-              :disabled="!batchTagToRemove || selectedBookmarks.length === 0"
-              class="px-4 py-2 bg-red-600 text-white rounded disabled:opacity-50"
-            >
-              Remove Tag
-            </button>
-          </div>
-        </div>
-      </div>
+      <BatchEditForm 
+        v-if="batchEditMode"
+        :selected-count="selectedBookmarks.length"
+        @add-tag="addTagToBatch"
+        @remove-tag="removeTagFromBatch"
+      />
 
       <!-- ブックマーク検索ボックス -->
       <div class="mb-3">
@@ -131,110 +100,14 @@
       </div>
       
       <!-- フォルダ構造表示 -->
-      <div v-if="showFolderStructure">
-        <ul class="list-none p-0">
-          <template v-for="bookmark in bookmarks" :key="bookmark.id">
-            <!-- ルートフォルダのみここで表示（重複表示を防ぐ） -->
-            <li v-if="bookmark.isFolder && (!bookmark.parentId || bookmark.parentId === '0' || bookmark.parentId === '1') && 
-                !bookmarks.some(b => b.id === bookmark.parentId && b.isFolder)" class="mb-1">
-              <div class="flex items-center py-2 px-1 hover:bg-gray-50 rounded">
-                <button 
-                  @click="toggleFolderExpanded(bookmark)" 
-                  class="mr-2 w-4 h-4 flex items-center justify-center"
-                >
-                  <span v-if="bookmark.expanded">▼</span>
-                  <span v-else>▶</span>
-                </button>
-                
-                <!-- フォルダ選択チェックボックス -->
-                <div class="mr-2">
-                  <input 
-                    type="checkbox" 
-                    :checked="getAllBookmarksInFolder(bookmark, bookmarks).some(b => b.selected && !b.isFolder)"
-                    @change="toggleFolderSelection(bookmark)"
-                    :indeterminate="
-                      getAllBookmarksInFolder(bookmark, bookmarks).some(b => b.selected && !b.isFolder) && 
-                      !getAllBookmarksInFolder(bookmark, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
-                    "
-                    class="h-4 w-4 text-blue-600"
-                  />
-                </div>
-                
-                <span class="font-medium">
-                  📁 {{ bookmark.title }}
-                </span>
-                <span class="ml-2 text-xs text-gray-500">
-                  ({{ getAllBookmarksInFolder(bookmark, bookmarks).filter(b => !b.isFolder).length }})
-                </span>
-              </div>
-              
-              <!-- フォルダ内のブックマーク -->
-              <div v-if="bookmark.expanded" class="pl-6">
-                <ul class="list-none p-0">
-                  <template v-for="child in bookmarks.filter(b => b.parentId === bookmark.id)" :key="child.id">
-                    <!-- サブフォルダの場合 -->
-                    <li v-if="child.isFolder" class="mb-1">
-                      <div class="flex items-center py-2 px-1 hover:bg-gray-50 rounded">
-                        <button 
-                          @click="toggleFolderExpanded(child)" 
-                          class="mr-2 w-4 h-4 flex items-center justify-center"
-                        >
-                          <span v-if="child.expanded">▼</span>
-                          <span v-else>▶</span>
-                        </button>
-                        
-                        <!-- フォルダ選択チェックボックス -->
-                        <div class="mr-2">
-                          <input 
-                            type="checkbox" 
-                            :checked="getAllBookmarksInFolder(child, bookmarks).some(b => b.selected && !b.isFolder)"
-                            @change="toggleFolderSelection(child)"
-                            :indeterminate="
-                              getAllBookmarksInFolder(child, bookmarks).some(b => b.selected && !b.isFolder) && 
-                              !getAllBookmarksInFolder(child, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
-                            "
-                            class="h-4 w-4 text-blue-600"
-                          />
-                        </div>
-                        
-                        <span class="font-medium">
-                          📁 {{ child.title }}
-                        </span>
-                        <span class="ml-2 text-xs text-gray-500">
-                          ({{ getAllBookmarksInFolder(child, bookmarks).filter(b => !b.isFolder).length }})
-                        </span>
-                      </div>
-                      
-                      <!-- サブフォルダ内のアイテム（再帰的に表示） -->
-                      <div v-if="child.expanded" class="pl-6">
-                        <BookmarkItem 
-                          v-for="grandchild in bookmarks.filter(b => b.parentId === child.id && !b.isFolder)"
-                          :key="grandchild.id"
-                          :bookmark="grandchild"
-                          :selectable="true"
-                          :selected="grandchild.selected || false"
-                          @update-title="updateBookmarkTitle"
-                          @toggle-select="toggleBookmarkSelection(grandchild)"
-                        />
-                      </div>
-                    </li>
-                    
-                    <!-- 通常のブックマークの場合 -->
-                    <BookmarkItem 
-                      v-else
-                      :bookmark="child"
-                      :selectable="true"
-                      :selected="child.selected || false"
-                      @update-title="updateBookmarkTitle"
-                      @toggle-select="toggleBookmarkSelection(child)"
-                    />
-                  </template>
-                </ul>
-              </div>
-            </li>
-          </template>
-        </ul>
-      </div>
+      <FolderView 
+        v-if="showFolderStructure" 
+        :bookmarks="bookmarks" 
+        @update-title="updateBookmarkTitle"
+        @toggle-select="toggleBookmarkSelection"
+        @toggle-folder-expanded="toggleFolderExpanded"
+        @toggle-folder-selection="toggleFolderSelection"
+      />
       
       <!-- フラットビュー表示 -->
       <ul v-else class="list-none p-0">
@@ -257,6 +130,8 @@ import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
 import BookmarkItem from '../../components/BookmarkItem.vue'
 import SearchBox from '../../components/SearchBox.vue'
+import FolderView from '../../components/FolderView.vue'
+import BatchEditForm from '../../components/BatchEditForm.vue'
 import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
@@ -504,12 +379,12 @@ const toggleBatchEditMode = () => {
 }
 
 // 選択されたブックマークに一括でタグを追加
-const addTagToBatch = async () => {
-  if (!batchTagToAdd.value || selectedBookmarks.value.length === 0) return
+const addTagToBatch = async (tagInput: string) => {
+  if (!tagInput || selectedBookmarks.value.length === 0) return
 
   try {
     loading.value = true
-    const tag = batchTagToAdd.value.startsWith('@') ? batchTagToAdd.value : `@${batchTagToAdd.value}`
+    const tag = tagInput.startsWith('@') ? tagInput : `@${tagInput}`
 
     for (const bookmark of selectedBookmarks.value) {
       if (!bookmark.isFolder && !extractTags(bookmark.title || '').includes(tag.substring(1))) {
@@ -519,7 +394,6 @@ const addTagToBatch = async () => {
       }
     }
 
-    batchTagToAdd.value = ''
     loading.value = false
   } catch (error) {
     console.error('タグの一括追加に失敗しました:', error)
@@ -528,12 +402,12 @@ const addTagToBatch = async () => {
 }
 
 // 選択されたブックマークから一括でタグを削除
-const removeTagFromBatch = async () => {
-  if (!batchTagToRemove.value || selectedBookmarks.value.length === 0) return
+const removeTagFromBatch = async (tagInput: string) => {
+  if (!tagInput || selectedBookmarks.value.length === 0) return
 
   try {
     loading.value = true
-    const tag = batchTagToRemove.value.startsWith('@') ? batchTagToRemove.value : `@${batchTagToRemove.value}`
+    const tag = tagInput.startsWith('@') ? tagInput : `@${tagInput}`
 
     for (const bookmark of selectedBookmarks.value) {
       if (!bookmark.isFolder && extractTags(bookmark.title || '').includes(tag.substring(1))) {
@@ -543,7 +417,6 @@ const removeTagFromBatch = async () => {
       }
     }
 
-    batchTagToRemove.value = ''
     loading.value = false
   } catch (error) {
     console.error('タグの一括削除に失敗しました:', error)
