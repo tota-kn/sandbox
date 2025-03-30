@@ -78,6 +78,16 @@ pnpm build
 - ロジックと表示を分離し、再利用可能な小さなコンポーネントを心がけること
 - 複雑なロジックはcomposablesに切り出すこと
 
+### Emitの型定義
+コンポーネントのイベントemitには必ず型定義を行うこと
+
+#### 例
+```ts
+const emit = defineEmits<{
+  change: [id: number]
+}>()
+```
+
 ## TSDoc 記述ルール
 
 ### 変数のドキュメント
