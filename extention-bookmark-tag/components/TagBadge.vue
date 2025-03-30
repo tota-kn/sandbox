@@ -16,7 +16,7 @@
       class="bg-transparent focus:outline-none w-full text-xs"
       @keydown.enter="saveEdit"
       @keydown.esc="cancelEdit"
-      @blur="saveEdit"
+      @blur="cancelEdit"
       @click.stop
     />
     <span v-else>{{ displayTag }}</span>

@@ -218,7 +218,7 @@ const handleTagEdit = async (oldTag: string, newTag: string): Promise<void> => {
     
     // 各ブックマークのタグを更新
     for (const bookmark of bookmarksToUpdate) {
-      const updatedTitle = bookmark.title?.replace(`@${oldTag}`, `@${newTag}`) || ''
+      const updatedTitle = bookmark.title?.replace(`${oldTag}`, `${newTag}`) || ''
       // bookmarkUtils.tsの関数を使用
       await updateBookmarkUtil(bookmark.id, updatedTitle)
       bookmark.title = updatedTitle // ローカルデータも更新
