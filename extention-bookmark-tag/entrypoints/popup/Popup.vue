@@ -98,32 +98,41 @@ import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBook
 
 /** 現在のタブオブジェクト */
 const currentTab = ref<chrome.tabs.Tab | null>(null);
+
 /** 現在のタブのブックマークオブジェクト（存在する場合） */
 const currentBookmark = ref<chrome.bookmarks.BookmarkTreeNode | null>(null);
+
 /** ブックマークのタイトル（タグを含む） */
 const bookmarkTitle = ref('');
+
 /** ブックマークのURL */
 const bookmarkUrl = ref('');
+
 /** データ読み込み中かどうか */
 const loading = ref(true);
+
 /** ユーザーへのメッセージ */
 const message = ref('');
+
+/** 新しく追加するタグの入力値 */
+const newTag = ref('');
+
+/** タグ入力時のサジェスト候補リスト */
+const tagSuggestions = ref<string[]>([]);
+
+/** サジェスト表示フラグ */
+const showSuggestions = ref(false);
+
+/** タグ追加モード（入力フィールド表示）かどうか */
+const isAddingTag = ref(false);
+
+/** タグ入力フィールドのref */
+const tagInput = ref<HTMLInputElement | null>(null);
 
 /** タイトルから抽出した現在表示中のタグリスト */
 const currentTags = computed(() => {
   return extractTags(bookmarkTitle.value);
 });
-
-/** 新しく追加するタグの入力値 */
-const newTag = ref('');
-/** タグ入力時のサジェスト候補リスト */
-const tagSuggestions = ref<string[]>([]);
-/** サジェスト表示フラグ */
-const showSuggestions = ref(false);
-/** タグ追加モード（入力フィールド表示）かどうか */
-const isAddingTag = ref(false);
-/** タグ入力フィールドのref */
-const tagInput = ref<HTMLInputElement | null>(null);
 
 /** タグ入力に応じたサジェストを生成する */
 const filterSuggestions = async (): Promise<void> => {
