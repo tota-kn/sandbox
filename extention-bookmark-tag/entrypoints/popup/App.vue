@@ -166,6 +166,20 @@ const saveBookmark = async () => {
   }
 };
 
+// ブックマークを削除
+const deleteBookmark = async () => {
+  if (currentBookmark.value) {
+    try {
+      await chrome.bookmarks.remove(currentBookmark.value.id);
+      message.value = 'ブックマークを削除しました';
+      currentBookmark.value = null;
+    } catch (error) {
+      console.error('ブックマークの削除に失敗しました:', error);
+      message.value = 'エラーが発生しました';
+    }
+  }
+};
+
 // コンポーネントのマウント時に現在のタブ情報を取得
 onMounted(() => {
   getCurrentTab();
@@ -242,12 +256,24 @@ onMounted(() => {
         </div>
       </div>
       
-      <button 
-        @click="saveBookmark"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md"
-      >
-        {{ currentBookmark ? '更新' : 'ブックマークに追加' }}
-      </button>
+      <div class="flex gap-2">
+        <button 
+          @click="saveBookmark"
+          class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md"
+        >
+          {{ currentBookmark ? '更新' : 'ブックマークに追加' }}
+        </button>
+        
+        <!-- ブックマーク削除ボタン（追加済みの場合のみ表示） -->
+        <button 
+          v-if="currentBookmark"
+          @click="deleteBookmark"
+          class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md"
+          title="ブックマークを削除"
+        >
+          削除
+        </button>
+      </div>
     </div>
   </div>
 </template>
