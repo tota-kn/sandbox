@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
 
 // 現在のタブ情報
@@ -22,11 +22,12 @@ const currentTags = computed(() => {
   return extractTags(bookmarkTitle.value);
 });
 
-// 新しいタグ
+// タグ入力関連の状態
 const newTag = ref('');
-// タグサジェスト用の変数
 const tagSuggestions = ref<string[]>([]);
 const showSuggestions = ref(false);
+const isAddingTag = ref(false); // タグ追加モードかどうか
+const tagInput = ref<HTMLInputElement | null>(null);
 
 // タグ入力に応じたサジェストを生成
 const filterSuggestions = () => {
@@ -82,11 +83,11 @@ const getCurrentTab = async () => {
       if (bookmarks && bookmarks.length > 0) {
         currentBookmark.value = bookmarks[0];
         bookmarkTitle.value = bookmarks[0].title || '';
-        message.value = 'ブックマーク済みのページです';
+        message.value = 'ブックマーク済み';
       } else {
         currentBookmark.value = null;
         bookmarkTitle.value = tabs[0].title || '';
-        message.value = 'このページはブックマークされていません';
+        message.value = 'ブックマークされていません';
       }
     }
     loading.value = false;
@@ -97,9 +98,21 @@ const getCurrentTab = async () => {
   }
 };
 
+// タグの追加モードを開始
+const startAddingTag = async () => {
+  isAddingTag.value = true;
+  newTag.value = '';
+  showSuggestions.value = false;
+  await nextTick();
+  tagInput.value?.focus();
+};
+
 // タグを追加
 const addTag = () => {
-  if (!newTag.value || newTag.value === '') return;
+  if (!newTag.value || newTag.value === '') {
+    isAddingTag.value = false;
+    return;
+  }
   
   // 先頭に@がなければ追加
   const tagToAdd = newTag.value.startsWith('@') ? newTag.value : `@${newTag.value}`;
@@ -107,6 +120,7 @@ const addTag = () => {
   // すでに同じタグがあれば追加しない
   if (currentTags.value.includes(tagToAdd)) {
     newTag.value = '';
+    isAddingTag.value = false;
     showSuggestions.value = false;
     return;
   }
@@ -114,6 +128,7 @@ const addTag = () => {
   // タイトルにタグを追加
   bookmarkTitle.value = `${bookmarkTitle.value} ${tagToAdd}`;
   newTag.value = '';
+  isAddingTag.value = false;
   showSuggestions.value = false;
 };
 
@@ -169,7 +184,6 @@ onMounted(() => {
       </div>
       
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">タイトル</label>
         <input 
           v-model="bookmarkTitle" 
           type="text" 
@@ -178,7 +192,6 @@ onMounted(() => {
       </div>
       
       <div class="mb-4 relative">
-        <label class="block text-sm font-medium text-gray-700 mb-1">タグ</label>
         <div class="flex flex-wrap gap-2 mb-2">
           <TagBadge 
             v-for="tag in currentTags" 
@@ -194,27 +207,34 @@ onMounted(() => {
               ×
             </button>
           </TagBadge>
-          <div v-if="currentTags.length === 0" class="text-sm text-gray-500 italic">
+          
+          <!-- タグ追加ボタンまたは入力欄 -->
+          <div class="inline-flex items-center">
+            <input 
+              v-if="isAddingTag" 
+              v-model="newTag" 
+              type="text" 
+              placeholder="新しいタグ" 
+              class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+              ref="tagInput"
+              @keyup.enter="addTag"
+              @input="filterSuggestions"
+              @blur="isAddingTag = false"
+            />
+            <button 
+              v-else 
+              @click="startAddingTag" 
+              class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
+              title="タグを追加"
+            >+</button>
+          </div>
+          
+          <div v-if="currentTags.length === 0 && !isAddingTag" class="text-sm text-gray-500 italic">
             タグがありません
           </div>
         </div>
         
-        <div class="flex mt-2">
-          <input 
-            v-model="newTag" 
-            type="text" 
-            placeholder="新しいタグ" 
-            class="flex-grow px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            @keyup.enter="addTag"
-            @input="filterSuggestions"
-          />
-          <button 
-            @click="addTag"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r-md"
-          >
-            追加
-          </button>
-        </div>
+        <!-- サジェスト表示エリア -->
         <div v-if="showSuggestions" class="absolute bg-white border border-gray-300 rounded-md mt-1 w-full z-10 max-h-40 overflow-y-auto shadow-md">
           <div v-for="suggestion in tagSuggestions" :key="suggestion" class="px-3 py-1 hover:bg-gray-100 cursor-pointer" @click="selectSuggestion(suggestion)">
             {{ suggestion }}
