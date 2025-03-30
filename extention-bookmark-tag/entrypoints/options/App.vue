@@ -32,7 +32,9 @@
           :key="tag"
           :tag="tag"
           :selected="selectedTags.includes(tag)"
+          :show-edit-button="true"
           @toggle="toggleTag(tag)"
+          @edit="handleTagEdit"
         />
       </div>
     </div>
@@ -118,6 +120,38 @@ const toggleTag = (tag: string) => {
     selectedTags.value = selectedTags.value.filter(t => t !== tag)
   } else {
     selectedTags.value.push(tag)
+  }
+}
+
+// タグ名の編集処理
+const handleTagEdit = async (oldTag: string, newTag: string) => {
+  try {
+    loading.value = true
+    
+    // 該当タグを含むブックマークを特定
+    const bookmarksToUpdate = bookmarks.value.filter(bookmark => 
+      extractTags(bookmark.title).includes(oldTag)
+    )
+    
+    // 各ブックマークのタグを更新
+    for (const bookmark of bookmarksToUpdate) {
+      const updatedTitle = bookmark.title.replace(oldTag, newTag)
+      await chrome.bookmarks.update(bookmark.id, { title: updatedTitle })
+      bookmark.title = updatedTitle // ローカルデータも更新
+    }
+    
+    // 選択中のタグがあれば、それも更新
+    if (selectedTags.value.includes(oldTag)) {
+      selectedTags.value = selectedTags.value.map(t => 
+        t === oldTag ? newTag : t
+      )
+    }
+    
+    // ブックマーク一覧を再取得せずに済むように、ここで処理完了を明示
+    loading.value = false
+  } catch (error) {
+    console.error('タグの更新に失敗しました:', error)
+    loading.value = false
   }
 }
 
