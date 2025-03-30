@@ -70,14 +70,20 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
 import { extractTags } from '../utils/tagUtils'
 
+/**
+ * ブックマークアイテムのプロパティ定義
+ */
 interface BookmarkProps {
+  /** ブックマーク情報 */
   bookmark: {
     id: string
     title: string
     url?: string
   }
-  selectable?: boolean  // 選択可能かどうか
-  selected?: boolean   // 選択状態
+  /** 選択可能かどうか */
+  selectable?: boolean
+  /** 選択状態 */
+  selected?: boolean
 }
 
 const props = withDefaults(defineProps<BookmarkProps>(), {
@@ -85,28 +91,37 @@ const props = withDefaults(defineProps<BookmarkProps>(), {
   selected: false
 })
 
-// 親コンポーネントに通知するイベント
+/** 親コンポーネントに通知するイベント */
 const emit = defineEmits(['update-title', 'toggle-select'])
 
-// 編集関連の状態
+/** 編集モードかどうかのフラグ */
 const isEditing = ref(false)
+/** 編集中のタイトル */
 const editTitle = ref('')
+/** タイトル入力フィールドへの参照 */
 const titleInput = ref<HTMLInputElement | null>(null)
 
-// タイトルからタグを除外した表示用タイトル
+/** 
+ * タイトルからタグを除外した表示用タイトル
+ */
 const displayTitle = computed(() => {
   // タグを除外したタイトルを返す処理
   const title = props.bookmark.title
   return title.replace(/@\S+/g, '').trim()
 })
 
-// ブックマークに含まれるタグの配列
+/** 
+ * ブックマークに含まれるタグの配列
+ */
 const bookmarkTags = computed(() => {
   return extractTags(props.bookmark.title)
 })
 
-// 編集モードの開始
-const startEdit = () => {
+/**
+ * 編集モードを開始する
+ * @returns {void}
+ */
+const startEdit = (): void => {
   editTitle.value = props.bookmark.title
   isEditing.value = true
   
@@ -116,14 +131,20 @@ const startEdit = () => {
   })
 }
 
-// 編集のキャンセル
-const cancelEdit = () => {
+/**
+ * 編集をキャンセルする
+ * @returns {void}
+ */
+const cancelEdit = (): void => {
   isEditing.value = false
   editTitle.value = ''
 }
 
-// 編集内容の保存
-const saveEdit = () => {
+/**
+ * 編集内容を保存する
+ * @returns {void}
+ */
+const saveEdit = (): void => {
   const newTitle = editTitle.value.trim()
   if (newTitle && newTitle !== props.bookmark.title) {
     emit('update-title', props.bookmark.id, newTitle)

@@ -107,22 +107,32 @@ import BatchEditForm from '../../components/BatchEditForm.vue'
 import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
+/** ブックマークの配列を管理する状態 */
 const bookmarks = ref<ExtendedBookmark[]>([])
+/** データ読込中かどうかのフラグ */
 const loading = ref(true)
+/** ブックマーク検索のクエリ文字列 */
 const bookmarkSearchQuery = ref('')
+/** タグ検索のクエリ文字列 */
 const tagSearchQuery = ref('')
+/** 選択されているタグのリスト */
 const selectedTags = ref<string[]>([])
+/** タグ検索のモード（AND検索かOR検索か） */
 const searchMode = ref<'and' | 'or'>('or')
-// 選択中のブックマークを管理
+/** 選択されているブックマーク一覧 */
 const selectedBookmarks = computed(() => bookmarks.value.filter(b => b.selected))
-// バッチ編集モード
+/** バッチ編集モードかどうかのフラグ */
 const batchEditMode = ref(false)
-// バッチ編集用の新しいタグ
+/** バッチ編集で追加するタグ */
 const batchTagToAdd = ref('')
+/** バッチ編集で削除するタグ */
 const batchTagToRemove = ref('')
 
-// ブックマークを取得する関数
-const fetchBookmarks = async () => {
+/**
+ * Chrome拡張のAPIを使用してブックマークを取得する
+ * @returns {Promise<void>}
+ */
+const fetchBookmarks = async (): Promise<void> => {
   try {
     // Chrome拡張のブックマークAPIを使用
     const results = await chrome.bookmarks.getTree()
@@ -143,8 +153,12 @@ const fetchBookmarks = async () => {
   }
 }
 
-// タグを切り替える
-const toggleTag = (tag: string) => {
+/**
+ * タグの選択状態を切り替える
+ * @param {string} tag タグ名
+ * @returns {void}
+ */
+const toggleTag = (tag: string): void => {
   if (selectedTags.value.includes(tag)) {
     selectedTags.value = selectedTags.value.filter(t => t !== tag)
   } else {
@@ -152,13 +166,21 @@ const toggleTag = (tag: string) => {
   }
 }
 
-// フォルダの展開状態を切り替える
-const toggleFolderExpanded = (folder: ExtendedBookmark) => {
+/**
+ * フォルダの展開状態を切り替える
+ * @param {ExtendedBookmark} folder 対象フォルダ
+ * @returns {void}
+ */
+const toggleFolderExpanded = (folder: ExtendedBookmark): void => {
   folder.expanded = !folder.expanded
 }
 
-// フォルダ内のすべてのブックマークの選択状態を切り替える
-const toggleFolderSelection = async (folder: ExtendedBookmark) => {
+/**
+ * フォルダ内のすべてのブックマークの選択状態を切り替える
+ * @param {ExtendedBookmark} folder 対象フォルダ
+ * @returns {Promise<void>}
+ */
+const toggleFolderSelection = async (folder: ExtendedBookmark): Promise<void> => {
   // フォルダ内のすべてのブックマークを取得
   const allFolderItems = getAllBookmarksInFolder(folder, bookmarks.value)
   
@@ -178,8 +200,13 @@ const toggleFolderSelection = async (folder: ExtendedBookmark) => {
   })
 }
 
-// タグ名の編集処理
-const handleTagEdit = async (oldTag: string, newTag: string) => {
+/**
+ * タグ名を編集する
+ * @param {string} oldTag 古いタグ名
+ * @param {string} newTag 新しいタグ名
+ * @returns {Promise<void>}
+ */
+const handleTagEdit = async (oldTag: string, newTag: string): Promise<void> => {
   try {
     loading.value = true
     
@@ -211,7 +238,7 @@ const handleTagEdit = async (oldTag: string, newTag: string) => {
   }
 }
 
-// 全てのユニークなタグを抽出
+/** 全てのブックマークからユニークなタグを抽出 */
 const uniqueTags = computed(() => {
   const allTags = bookmarks.value
     .filter(bookmark => !bookmark.isFolder)
@@ -219,7 +246,7 @@ const uniqueTags = computed(() => {
   return [...new Set(allTags)]
 })
 
-// タグ検索でフィルタリングしたタグリスト
+/** 検索条件でフィルタリングしたタグリスト */
 const filteredTags = computed(() => {
   if (!tagSearchQuery.value) {
     return uniqueTags.value
@@ -231,7 +258,7 @@ const filteredTags = computed(() => {
   )
 })
 
-// フィルタリングされたブックマーク
+/** 検索条件でフィルタリングしたブックマークリスト */
 const filteredBookmarks = computed(() => {
   let filtered = bookmarks.value
   
@@ -267,8 +294,14 @@ const filteredBookmarks = computed(() => {
   
   return filtered
 })
-// ブックマークのタイトルを更新する
-const updateBookmarkTitle = async (bookmarkId: string, newTitle: string) => {
+
+/**
+ * ブックマークのタイトルを更新する
+ * @param {string} bookmarkId 更新対象のブックマークID
+ * @param {string} newTitle 新しいタイトル
+ * @returns {Promise<void>}
+ */
+const updateBookmarkTitle = async (bookmarkId: string, newTitle: string): Promise<void> => {
   try {
     // bookmarkUtils.tsの関数を使用
     await updateBookmarkUtil(bookmarkId, newTitle)
@@ -293,20 +326,30 @@ onMounted(() => {
   fetchBookmarks()
 })
 
-// ブックマークの選択状態を切り替える
-const toggleBookmarkSelection = (bookmark: ExtendedBookmark) => {
+/**
+ * ブックマークの選択状態を切り替える
+ * @param {ExtendedBookmark} bookmark 対象のブックマーク
+ * @returns {void}
+ */
+const toggleBookmarkSelection = (bookmark: ExtendedBookmark): void => {
   bookmark.selected = !bookmark.selected
 }
 
-// すべてのブックマークの選択をクリア
-const clearAllSelection = () => {
+/**
+ * すべてのブックマークの選択を解除する
+ * @returns {void}
+ */
+const clearAllSelection = (): void => {
   bookmarks.value.forEach(bookmark => {
     bookmark.selected = false
   })
 }
 
-// バッチ編集モードの切り替え
-const toggleBatchEditMode = () => {
+/**
+ * バッチ編集モードの切り替え
+ * @returns {void}
+ */
+const toggleBatchEditMode = (): void => {
   batchEditMode.value = !batchEditMode.value
   if (!batchEditMode.value) {
     // バッチ編集モードを終了したら入力をクリア
@@ -315,8 +358,12 @@ const toggleBatchEditMode = () => {
   }
 }
 
-// 選択されたブックマークに一括でタグを追加
-const addTagToBatch = async (tagInput: string) => {
+/**
+ * 選択されたブックマークに一括でタグを追加
+ * @param {string} tagInput 追加するタグ
+ * @returns {Promise<void>}
+ */
+const addTagToBatch = async (tagInput: string): Promise<void> => {
   if (!tagInput || selectedBookmarks.value.length === 0) return
 
   try {
@@ -338,8 +385,12 @@ const addTagToBatch = async (tagInput: string) => {
   }
 }
 
-// 選択されたブックマークから一括でタグを削除
-const removeTagFromBatch = async (tagInput: string) => {
+/**
+ * 選択されたブックマークから一括でタグを削除
+ * @param {string} tagInput 削除するタグ
+ * @returns {Promise<void>}
+ */
+const removeTagFromBatch = async (tagInput: string): Promise<void> => {
   if (!tagInput || selectedBookmarks.value.length === 0) return
 
   try {

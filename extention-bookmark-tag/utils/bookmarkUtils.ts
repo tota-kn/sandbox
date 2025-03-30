@@ -1,17 +1,27 @@
 import { extractTags } from './tagUtils';
 import { getCurrentTab, getTabUrl, getTabTitle } from './tabUtils';
 
-// ブックマークの拡張型定義
+/**
+ * ブックマークの拡張型定義
+ * Chrome API のブックマークツリーノードに追加プロパティを持たせた拡張型
+ */
 export interface ExtendedBookmark extends chrome.bookmarks.BookmarkTreeNode {
-    isFolder?: boolean // フォルダかどうかのフラグ
-    path?: string[] // パス情報（フォルダ階層）
-    selected?: boolean // 選択状態
-    expanded?: boolean // フォルダの展開状態
-    depth?: number // フォルダの階層の深さ
+    /** フォルダかどうかのフラグ */
+    isFolder?: boolean 
+    /** パス情報（フォルダ階層） */
+    path?: string[] 
+    /** 選択状態 */
+    selected?: boolean 
+    /** フォルダの展開状態 */
+    expanded?: boolean 
+    /** フォルダの階層の深さ */
+    depth?: number 
 }
 
 /**
  * 現在のタブのブックマーク情報を取得する
+ * @returns {Promise<{tab: chrome.tabs.Tab | null, bookmark: chrome.bookmarks.BookmarkTreeNode | null, url: string, title: string}>} 
+ *          現在のタブ、ブックマーク情報、URL、タイトルを含むオブジェクト
  */
 export const getCurrentTabBookmark = async (): Promise<{
     tab: chrome.tabs.Tab | null;
@@ -46,6 +56,9 @@ export const getCurrentTabBookmark = async (): Promise<{
 
 /**
  * ブックマークを更新する
+ * @param {string} bookmarkId 更新するブックマークのID
+ * @param {string} title 新しいブックマークタイトル
+ * @returns {Promise<{success: boolean, message: string}>} 処理結果を含むオブジェクト
  */
 export const updateBookmark = async (
     bookmarkId: string,
@@ -62,6 +75,10 @@ export const updateBookmark = async (
 
 /**
  * 新しいブックマークを作成する
+ * @param {string} title ブックマークのタイトル
+ * @param {string} url ブックマークのURL
+ * @returns {Promise<{success: boolean, message: string, bookmark?: chrome.bookmarks.BookmarkTreeNode}>} 
+ *          処理結果と作成されたブックマーク情報を含むオブジェクト
  */
 export const createBookmark = async (
     title: string,
@@ -95,6 +112,8 @@ export const createBookmark = async (
 
 /**
  * ブックマークを削除する
+ * @param {string} bookmarkId 削除するブックマークのID
+ * @returns {Promise<{success: boolean, message: string}>} 処理結果を含むオブジェクト
  */
 export const deleteBookmark = async (
     bookmarkId: string
@@ -110,6 +129,9 @@ export const deleteBookmark = async (
 
 /**
  * 既存タグからサジェストを生成する
+ * @param {string} input 入力されたテキスト（タグの一部）
+ * @param {string[]} currentTags 現在選択されているタグのリスト
+ * @returns {Promise<string[]>} サジェストされたタグのリスト
  */
 export const generateTagSuggestions = async (
     input: string,
@@ -145,10 +167,10 @@ export const generateTagSuggestions = async (
 
 /**
  * Chrome APIからのブックマークツリーを平坦化する
- * @param bookmarkNodes ブックマークツリー
- * @param path 現在のパス
- * @param depth 現在の深さ
- * @returns 拡張したブックマークの配列
+ * @param {chrome.bookmarks.BookmarkTreeNode[]} bookmarkNodes ブックマークツリー
+ * @param {string[]} path 現在のパス
+ * @param {number} depth 現在の深さ
+ * @returns {ExtendedBookmark[]} 拡張したブックマークの配列
  */
 export const flattenBookmarks = (
     bookmarkNodes: chrome.bookmarks.BookmarkTreeNode[],
@@ -188,9 +210,9 @@ export const flattenBookmarks = (
 
 /**
  * ディレクトリ内のすべてのブックマークを再帰的に取得
- * @param folder フォルダブックマーク
- * @param allBookmarks すべてのブックマーク配列（再帰呼び出し用）
- * @returns フォルダ内のすべてのブックマーク（サブフォルダ含む）
+ * @param {ExtendedBookmark} folder フォルダブックマーク
+ * @param {ExtendedBookmark[]} allBookmarks すべてのブックマーク配列（再帰呼び出し用）
+ * @returns {ExtendedBookmark[]} フォルダ内のすべてのブックマーク（サブフォルダ含む）
  */
 export const getAllBookmarksInFolder = (
     folder: ExtendedBookmark,

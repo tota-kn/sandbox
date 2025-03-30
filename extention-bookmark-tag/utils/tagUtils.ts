@@ -1,44 +1,53 @@
 /**
- * タイトルからタグを抽出する関数（@タグ形式）
+ * タイトル文字列からタグを抽出する
+ * @param title タイトル文字列
+ * @returns 抽出されたタグの配列（@マーク付き）
  */
 export const extractTags = (title: string): string[] => {
-    const tagRegex = /(?:^|\s)(@[^\s]+)/g;
-    const matches = [...title.matchAll(tagRegex)];
-    return matches.map(match => match[1]);
+  if (!title) {
+    return [];
+  }
+
+  const tagRegex = /@(\S+)/g;
+  const matches = title.match(tagRegex);
+  
+  return matches ? matches : [];
 };
 
 /**
- * タグからプレフィックス(@)を削除する
+ * テキストから@プレフィックスを削除する
+ * @param text 処理対象のテキスト
+ * @returns @プレフィックスが削除されたテキスト
  */
-export const removeTagPrefix = (tag: string): string => {
-    return tag.startsWith('@') ? tag.substring(1) : tag;
+export const removeTagPrefix = (text: string): string => {
+  return text.startsWith('@') ? text.substring(1) : text;
 };
 
 /**
- * タグにプレフィックス(@)を追加する
+ * テキストに@プレフィックスを追加する（既に@がある場合は追加しない）
+ * @param text 処理対象のテキスト
+ * @returns @プレフィックスが追加されたテキスト
  */
-export const addTagPrefix = (tag: string): string => {
-    return tag.startsWith('@') ? tag : `@${tag}`;
+export const addTagPrefix = (text: string): string => {
+  return text.startsWith('@') ? text : `@${text}`;
 };
 
 /**
- * タイトルからタグを削除する
+ * 同じタグが重複しないようにタグをマージする
+ * @param existingTags 既存のタグ配列
+ * @param newTags 新規のタグ配列
+ * @returns マージされたユニークなタグの配列
  */
-export const removeTagFromTitle = (title: string, tagToRemove: string): string => {
-    return title.replace(tagToRemove, '').replace(/\s+/g, ' ').trim();
+export const mergeTags = (existingTags: string[], newTags: string[]): string[] => {
+  const uniqueTags = new Set([...existingTags, ...newTags]);
+  return Array.from(uniqueTags);
 };
 
 /**
- * タイトルにタグを追加する
+ * タグを文字列に変換する（スペース区切り）
+ * @param tags タグの配列
+ * @returns スペース区切りでタグを結合した文字列
  */
-export const addTagToTitle = (title: string, tag: string): string => {
-    const formattedTag = addTagPrefix(tag);
-    return `${title} ${formattedTag}`.trim();
-};
-
-/**
- * タイトルからすべてのタグを除去した表示用タイトルを作成
- */
-export const createDisplayTitle = (title: string): string => {
-    return title.replace(/\s?@[^\s]+\s?/g, ' ').trim();
+export const tagsToString = (tags: string[]): string => {
+  return tags.join(' ');
 };

@@ -38,29 +38,47 @@
 import { computed, ref, nextTick } from 'vue'
 import { removeTagPrefix, addTagPrefix } from '../utils/tagUtils'
 
+/** 
+ * コンポーネントのプロパティ定義
+ */
 const props = defineProps<{
+  /** 表示するタグ文字列 */
   tag: string
+  /** タグが選択状態かどうか */
   selected?: boolean
+  /** 編集ボタンを表示するかどうか */
   showEditButton?: boolean
 }>()
 
+/**
+ * コンポーネントから発行されるイベント定義
+ */
 const emits = defineEmits<{
+  /** タグの選択状態切り替えイベント */
   (e: 'toggle'): void
+  /** タグ編集イベント */
   (e: 'edit', oldTag: string, newTag: string): void
 }>()
 
-// 編集モード関連の状態
+/** 編集モードかどうかのフラグ */
 const isEditing = ref(false)
+/** 編集中のタグ文字列 */
 const editingValue = ref('')
+/** 入力フィールドへの参照 */
 const inputRef = ref<HTMLInputElement | null>(null)
 
-// @マークを削除して表示する
+/** 
+ * @マークを削除した表示用のタグ文字列
+ */
 const displayTag = computed(() => {
   return removeTagPrefix(props.tag)
 })
 
-// 編集モードを開始
-const startEditing = () => {
+/**
+ * 編集モードを開始する
+ * @returns {void}
+ */
+const startEditing = (): void => {
   isEditing.value = true
   editingValue.value = displayTag.value
   nextTick(() => {
@@ -68,13 +86,19 @@ const startEditing = () => {
   })
 }
 
-// 編集をキャンセル
-const cancelEdit = () => {
+/**
+ * 編集をキャンセルする
+ * @returns {void}
+ */
+const cancelEdit = (): void => {
   isEditing.value = false
 }
 
-// 編集内容を保存
-const saveEdit = () => {
+/**
+ * 編集内容を保存する
+ * @returns {void}
+ */
+const saveEdit = (): void => {
   if (isEditing.value) {
     const newValue = editingValue.value.trim()
     if (newValue && newValue !== displayTag.value) {

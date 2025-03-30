@@ -25,12 +25,24 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * SearchBoxコンポーネントのプロパティ定義
+ */
 defineProps<{
+  /** 入力値（v-modelで連携） */
   modelValue: string
+  /** 入力欄のプレースホルダーテキスト */
   placeholder?: string
 }>()
 
+/**
+ * 親コンポーネントに通知するイベント
+ */
 defineEmits<{
+  /**
+   * 入力値が変更されたときに発火するイベント
+   * @param value 新しい入力値
+   */
   (e: 'update:modelValue', value: string): void
 }>()
 </script>

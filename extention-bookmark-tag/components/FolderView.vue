@@ -107,28 +107,43 @@
 import BookmarkItem from './BookmarkItem.vue'
 import { ExtendedBookmark, getAllBookmarksInFolder } from '../utils/bookmarkUtils'
 
+/**
+ * フォルダビューコンポーネントのプロパティ定義
+ */
 const props = defineProps<{
+  /** 表示するブックマーク配列 */
   bookmarks: ExtendedBookmark[]
 }>()
 
+/**
+ * 親コンポーネントに通知するイベント
+ */
 const emit = defineEmits<{
+  /** タイトル更新イベント */
   (e: 'update-title', id: string, newTitle: string): void
+  /** ブックマーク選択状態変更イベント */
   (e: 'toggle-select', bookmark: ExtendedBookmark): void
+  /** フォルダ展開状態変更イベント */
   (e: 'toggle-folder-expanded', folder: ExtendedBookmark): void
+  /** フォルダ内ブックマークの一括選択状態変更イベント */
   (e: 'toggle-folder-selection', folder: ExtendedBookmark): void
 }>()
 
 /**
  * フォルダの展開状態を切り替える
+ * @param {ExtendedBookmark} folder フォルダブックマーク
+ * @returns {void}
  */
-const toggleFolderExpanded = (folder: ExtendedBookmark) => {
+const toggleFolderExpanded = (folder: ExtendedBookmark): void => {
   emit('toggle-folder-expanded', folder)
 }
 
 /**
  * フォルダ内のブックマークの選択状態を切り替える
+ * @param {ExtendedBookmark} folder フォルダブックマーク
+ * @returns {void}
  */
-const toggleFolderSelection = (folder: ExtendedBookmark) => {
+const toggleFolderSelection = (folder: ExtendedBookmark): void => {
   emit('toggle-folder-selection', folder)
 }
 </script>

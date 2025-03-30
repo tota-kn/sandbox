@@ -41,22 +41,34 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+/**
+ * バッチ編集フォームのプロパティ定義
+ */
 const props = defineProps<{
+  /** 選択されているブックマークの数 */
   selectedCount: number
 }>()
 
+/**
+ * 親コンポーネントに通知するイベント
+ */
 const emit = defineEmits<{
+  /** タグ追加イベント */
   (e: 'add-tag', tag: string): void
+  /** タグ削除イベント */
   (e: 'remove-tag', tag: string): void
 }>()
 
+/** 追加するタグの入力値 */
 const tagToAdd = ref('')
+/** 削除するタグの入力値 */
 const tagToRemove = ref('')
 
 /**
  * タグを追加する
+ * @returns {void}
  */
-const addTag = () => {
+const addTag = (): void => {
   if (!tagToAdd.value || props.selectedCount === 0) return
   emit('add-tag', tagToAdd.value)
   tagToAdd.value = ''
@@ -64,8 +76,9 @@ const addTag = () => {
 
 /**
  * タグを削除する
+ * @returns {void}
  */
-const removeTag = () => {
+const removeTag = (): void => {
   if (!tagToRemove.value || props.selectedCount === 0) return
   emit('remove-tag', tagToRemove.value)
   tagToRemove.value = ''

@@ -1,10 +1,15 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-defineProps({
-  msg: String,
-});
+/**
+ * HelloWorldコンポーネントのプロパティ定義
+ */
+defineProps<{
+  /** 表示するメッセージ */
+  msg?: string
+}>();
 
+/** カウント数を管理する状態変数 */
 const count = ref(0);
 </script>
 
