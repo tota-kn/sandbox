@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
 import { extractTags, addTagPrefix, removeTagFromTitle } from '../../utils/tagUtils';
+import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil, generateTagSuggestions } from '../../utils/bookmarkUtils';
 
 // 現在のタブ情報
 const currentTab = ref<chrome.tabs.Tab | null>(null);
@@ -24,34 +25,17 @@ const isAddingTag = ref(false); // タグ追加モードかどうか
 const tagInput = ref<HTMLInputElement | null>(null);
 
 // タグ入力に応じたサジェストを生成
-const filterSuggestions = () => {
+const filterSuggestions = async () => {
   if (!newTag.value) {
     tagSuggestions.value = [];
     showSuggestions.value = false;
     return;
   }
 
-  const input = newTag.value.toLowerCase().replace(/^@/, '');
-  // すでに存在するタグから検索クエリに一致するものをフィルタリング
-  const allExistingTags = chrome.bookmarks.search({}).then(allBookmarks => {
-    const tagSet = new Set<string>();
-    
-    allBookmarks.forEach(bookmark => {
-      const tags = extractTags(bookmark.title || '');
-      tags.forEach(tag => {
-        // @を除いた部分で比較
-        const tagText = tag.slice(1).toLowerCase();
-        if (tagText.includes(input)) {
-          tagSet.add(tag);
-        }
-      });
-    });
-    
-    // 現在すでに選択されているタグは除外
-    const filteredTags = Array.from(tagSet).filter(tag => !currentTags.value.includes(tag));
-    tagSuggestions.value = filteredTags;
-    showSuggestions.value = filteredTags.length > 0;
-  });
+  // utils/bookmarkUtils.tsの関数を使用
+  const suggestions = await generateTagSuggestions(newTag.value, currentTags.value);
+  tagSuggestions.value = suggestions;
+  showSuggestions.value = suggestions.length > 0;
 };
 
 // サジェストからタグを選択
@@ -66,24 +50,16 @@ const selectSuggestion = (tag: string) => {
 // 現在のタブ情報を取得
 const getCurrentTab = async () => {
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tabs[0]) {
-      currentTab.value = tabs[0];
-      bookmarkUrl.value = tabs[0].url || '';
-      
-      // このURLがブックマークされているか確認
-      const bookmarks = await chrome.bookmarks.search({ url: bookmarkUrl.value });
-      
-      if (bookmarks && bookmarks.length > 0) {
-        currentBookmark.value = bookmarks[0];
-        bookmarkTitle.value = bookmarks[0].title || '';
-        message.value = 'Bookmarked';
-      } else {
-        currentBookmark.value = null;
-        bookmarkTitle.value = tabs[0].title || '';
-        message.value = 'Not bookmarked';
-      }
-    }
+    loading.value = true;
+    
+    // utils/bookmarkUtils.tsの関数を使用
+    const result = await getCurrentTabBookmark();
+    currentTab.value = result.tab;
+    currentBookmark.value = result.bookmark;
+    bookmarkUrl.value = result.url;
+    bookmarkTitle.value = result.title;
+    
+    message.value = currentBookmark.value ? 'Bookmarked' : 'Not bookmarked';
     loading.value = false;
   } catch (error) {
     console.error('タブ情報の取得に失敗しました:', error);
@@ -138,11 +114,9 @@ const updateBookmark = async () => {
       throw new Error('Bookmark not found');
     }
     
-    await chrome.bookmarks.update(currentBookmark.value.id, {
-      title: bookmarkTitle.value
-    });
-    
-    message.value = 'Updated';
+    // utils/bookmarkUtils.tsの関数を使用
+    const result = await updateBookmarkUtil(currentBookmark.value.id, bookmarkTitle.value);
+    message.value = result.message;
   } catch (error) {
     console.error('ブックマークの更新に失敗しました:', error);
     message.value = 'Error occurred';
@@ -152,24 +126,19 @@ const updateBookmark = async () => {
 // 新しいブックマークを作成
 const createBookmark = async () => {
   try {
-    // デフォルトのブックマークフォルダを使用
-    const bookmarkTree = await chrome.bookmarks.getTree();
-    const defaultFolder = bookmarkTree[0].children?.[1]?.id; // 通常はブックマークバー
+    // utils/bookmarkUtils.tsの関数を使用
+    const result = await createBookmarkUtil(bookmarkTitle.value, bookmarkUrl.value);
     
-    if (!defaultFolder) {
-      throw new Error('Default folder not found');
+    if (result.success && result.bookmark) {
+      currentBookmark.value = result.bookmark;
     }
     
-    await chrome.bookmarks.create({
-      parentId: defaultFolder,
-      title: bookmarkTitle.value,
-      url: bookmarkUrl.value
-    });
-    
-    message.value = 'Bookmarked';
+    message.value = result.message;
     
     // 再度情報を取得して更新
-    await getCurrentTab();
+    if (result.success) {
+      await getCurrentTab();
+    }
   } catch (error) {
     console.error('ブックマークの作成に失敗しました:', error);
     message.value = 'Error occurred';
@@ -192,11 +161,15 @@ const deleteBookmark = async () => {
       throw new Error('Bookmark not found');
     }
     
-    await chrome.bookmarks.remove(currentBookmark.value.id);
+    // utils/bookmarkUtils.tsの関数を使用
+    const result = await deleteBookmarkUtil(currentBookmark.value.id);
     
-    // 状態リセット
-    currentBookmark.value = null;
-    message.value = 'Removed';
+    if (result.success) {
+      // 状態リセット
+      currentBookmark.value = null;
+    }
+    
+    message.value = result.message;
   } catch (error) {
     console.error('ブックマークの削除に失敗しました:', error);
     message.value = 'Error occurred';

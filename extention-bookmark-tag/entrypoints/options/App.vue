@@ -73,6 +73,7 @@ import TagBadge from '../../components/TagBadge.vue'
 import BookmarkItem from '../../components/BookmarkItem.vue'
 import SearchBox from '../../components/SearchBox.vue'
 import { extractTags } from '../../utils/tagUtils'
+import { flattenBookmarks, updateBookmark as updateBookmarkUtil } from '../../utils/bookmarkUtils'
 
 // ブックマークの型定義
 interface Bookmark {
@@ -94,30 +95,13 @@ const fetchBookmarks = async () => {
   try {
     // Chrome拡張のブックマークAPIを使用
     const results = await chrome.bookmarks.getTree()
-    // 取得したツリー構造を平坦化
+    // 取得したツリー構造を平坦化（bookmarkUtils.tsの関数を使用）
     bookmarks.value = flattenBookmarks(results)
     loading.value = false
   } catch (error) {
     console.error('ブックマークの取得に失敗しました:', error)
     loading.value = false
   }
-}
-
-// ブックマークの階層構造を平坦化する関数
-const flattenBookmarks = (bookmarkItems: Bookmark[]): Bookmark[] => {
-  let result: Bookmark[] = []
-  
-  for (const item of bookmarkItems) {
-    if (item.url) {
-      result.push(item)
-    }
-    
-    if (item.children) {
-      result = result.concat(flattenBookmarks(item.children))
-    }
-  }
-  
-  return result
 }
 
 // タグを切り替える
@@ -142,7 +126,8 @@ const handleTagEdit = async (oldTag: string, newTag: string) => {
     // 各ブックマークのタグを更新
     for (const bookmark of bookmarksToUpdate) {
       const updatedTitle = bookmark.title.replace(oldTag, newTag)
-      await chrome.bookmarks.update(bookmark.id, { title: updatedTitle })
+      // bookmarkUtils.tsの関数を使用
+      await updateBookmarkUtil(bookmark.id, updatedTitle)
       bookmark.title = updatedTitle // ローカルデータも更新
     }
     
@@ -213,9 +198,8 @@ const filteredBookmarks = computed(() => {
 // ブックマークのタイトルを更新する
 const updateBookmarkTitle = async (bookmarkId: string, newTitle: string) => {
   try {
-    await chrome.bookmarks.update(bookmarkId, {
-      title: newTitle
-    })
+    // bookmarkUtils.tsの関数を使用
+    await updateBookmarkUtil(bookmarkId, newTitle)
     
     // ローカルのブックマークデータを更新
     const bookmark = bookmarks.value.find(b => b.id === bookmarkId)
