@@ -1,12 +1,12 @@
 <template>
   <div class="max-w-3xl mx-auto p-5 font-sans">
-    <h1 class="text-2xl font-bold text-gray-800 pb-3 mb-4 border-b-2 border-gray-100">ブックマークタグ管理</h1>
+    <h1 class="text-2xl font-bold text-gray-800 pb-3 mb-4 border-b-2 border-gray-100">Bookmark Tag Manager</h1>
     
     <div class="mb-6">
       <div class="flex items-center mb-3">
-        <h2 class="text-xl font-semibold mr-4">タグ一覧</h2>
+        <h2 class="text-xl font-semibold mr-4">Tag List</h2>
         <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">絞り込み：</span>
+          <span class="text-sm text-gray-600">Filter:</span>
           <label class="inline-flex items-center gap-1 cursor-pointer">
             <input type="radio" v-model="searchMode" value="or" class="form-radio text-blue-600" />
             <span class="text-sm">OR</span>
@@ -22,7 +22,7 @@
       <div class="mb-3">
         <SearchBox 
           v-model="tagSearchQuery" 
-          placeholder="タグを検索..."
+          placeholder="Search tags..."
         />
       </div>
 
@@ -41,19 +41,19 @@
     </div>
     
     <div class="mt-8">
-      <h2 class="text-xl font-semibold mb-3">ブックマーク一覧</h2>
+      <h2 class="text-xl font-semibold mb-3">Bookmark List</h2>
 
       <!-- ブックマーク検索ボックス -->
       <div class="mb-3">
         <SearchBox 
           v-model="bookmarkSearchQuery" 
-          placeholder="タイトルまたはURLで検索..."
+          placeholder="Search by title or URL..."
         />
       </div>
 
-      <div v-if="loading" class="py-4">読み込み中...</div>
+      <div v-if="loading" class="py-4">Loading...</div>
       <div v-else-if="filteredBookmarks.length === 0" class="py-5 text-gray-500 italic">
-        表示するブックマークがありません
+        No bookmarks to display
       </div>
       <ul v-else class="list-none p-0">
         <BookmarkItem 

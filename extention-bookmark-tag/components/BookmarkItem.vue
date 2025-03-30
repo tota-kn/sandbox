@@ -23,7 +23,7 @@
             v-if="isEditing" 
             v-model="newTag" 
             @keyup.enter="addTag" 
-            placeholder="新しいタグ" 
+            placeholder="New tag" 
             class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
             ref="tagInput"
             @blur="isEditing = false"

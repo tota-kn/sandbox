@@ -83,17 +83,17 @@ const getCurrentTab = async () => {
       if (bookmarks && bookmarks.length > 0) {
         currentBookmark.value = bookmarks[0];
         bookmarkTitle.value = bookmarks[0].title || '';
-        message.value = 'ブックマーク済み';
+        message.value = 'Bookmarked';
       } else {
         currentBookmark.value = null;
         bookmarkTitle.value = tabs[0].title || '';
-        message.value = 'ブックマークされていません';
+        message.value = 'Not bookmarked';
       }
     }
     loading.value = false;
   } catch (error) {
     console.error('タブ情報の取得に失敗しました:', error);
-    message.value = 'エラーが発生しました';
+    message.value = 'Error occurred';
     loading.value = false;
   }
 };
@@ -145,14 +145,14 @@ const saveBookmark = async () => {
       await chrome.bookmarks.update(currentBookmark.value.id, {
         title: bookmarkTitle.value
       });
-      message.value = 'ブックマークを更新しました';
+      message.value = 'Bookmark updated';
     } else {
       // 新規ブックマーク作成
       await chrome.bookmarks.create({
         title: bookmarkTitle.value,
         url: bookmarkUrl.value
       });
-      message.value = 'ブックマークに追加しました';
+      message.value = 'Bookmark added';
       
       // ブックマーク状態を更新
       const bookmarks = await chrome.bookmarks.search({ url: bookmarkUrl.value });
@@ -162,7 +162,7 @@ const saveBookmark = async () => {
     }
   } catch (error) {
     console.error('ブックマークの保存に失敗しました:', error);
-    message.value = 'エラーが発生しました';
+    message.value = 'Error occurred';
   }
 };
 
@@ -171,11 +171,11 @@ const deleteBookmark = async () => {
   if (currentBookmark.value) {
     try {
       await chrome.bookmarks.remove(currentBookmark.value.id);
-      message.value = 'ブックマークを削除しました';
+      message.value = 'Bookmark deleted';
       currentBookmark.value = null;
     } catch (error) {
       console.error('ブックマークの削除に失敗しました:', error);
-      message.value = 'エラーが発生しました';
+      message.value = 'Error occurred';
     }
   }
 };
@@ -189,7 +189,7 @@ onMounted(() => {
 <template>
   <div class="w-80 p-4 font-sans">
     <div v-if="loading" class="text-gray-600">
-      読み込み中...
+      Loading...
     </div>
     
     <div v-else>
@@ -216,7 +216,7 @@ onMounted(() => {
             <button 
               @click.stop="removeTag(tag)" 
               class="ml-1 text-blue-600 hover:text-blue-800 font-bold"
-              title="タグを削除"
+              title="Remove tag"
             >
               ×
             </button>
@@ -228,7 +228,7 @@ onMounted(() => {
               v-if="isAddingTag" 
               v-model="newTag" 
               type="text" 
-              placeholder="新しいタグ" 
+              placeholder="New tag" 
               class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
               ref="tagInput"
               @keyup.enter="addTag"
@@ -239,12 +239,12 @@ onMounted(() => {
               v-else 
               @click="startAddingTag" 
               class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
-              title="タグを追加"
+              title="Add tag"
             >+</button>
           </div>
           
           <div v-if="currentTags.length === 0 && !isAddingTag" class="text-sm text-gray-500 italic">
-            タグがありません
+            No tags
           </div>
         </div>
         
@@ -261,7 +261,7 @@ onMounted(() => {
           @click="saveBookmark"
           class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md"
         >
-          {{ currentBookmark ? '更新' : 'ブックマークに追加' }}
+          {{ currentBookmark ? 'Update' : 'Add to Bookmarks' }}
         </button>
         
         <!-- ブックマーク削除ボタン（追加済みの場合のみ表示） -->
@@ -269,9 +269,9 @@ onMounted(() => {
           v-if="currentBookmark"
           @click="deleteBookmark"
           class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md"
-          title="ブックマークを削除"
+          title="Delete bookmark"
         >
-          削除
+          Delete
         </button>
       </div>
     </div>
