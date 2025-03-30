@@ -37,6 +37,12 @@
           @toggle="toggleTag(tag)"
           @edit="handleTagEdit"
         />
+        
+        <!-- タグ追加ボタンを共通コンポーネントに置き換え -->
+        <TagAddButton 
+          :current-tags="uniqueTags"
+          @add-tag="addGlobalTag"
+        />
       </div>
     </div>
     
@@ -100,11 +106,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
+import TagAddButton from '../../components/TagAddButton.vue'
 import BookmarkItem from '../../components/BookmarkItem.vue'
 import SearchBox from '../../components/SearchBox.vue'
 import FolderView from '../../components/FolderView.vue'
 import BatchEditForm from '../../components/BatchEditForm.vue'
-import { extractTags } from '../../utils/tagUtils'
+import { extractTags, addTagPrefix } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
 /** ブックマークの配列を管理する状態 */
@@ -411,4 +418,11 @@ const removeTagFromBatch = async (tagInput: string): Promise<void> => {
     loading.value = false
   }
 }
+
+/**
+ * 新しいグローバルタグを追加する
+ * @param {string} tag - 追加するタグ
+ */
+const addGlobalTag = async (tag: string): Promise<void> => {
+};
 </script>

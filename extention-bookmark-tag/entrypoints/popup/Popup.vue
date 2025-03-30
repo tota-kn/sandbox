@@ -34,36 +34,14 @@
             </button>
           </TagBadge>
           
-          <!-- タグ追加ボタンまたは入力欄 -->
-          <div class="inline-flex items-center">
-            <input 
-              v-if="isAddingTag" 
-              v-model="newTag" 
-              type="text" 
-              placeholder="New tag" 
-              class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
-              ref="tagInput"
-              @keyup.enter="addTag"
-              @input="filterSuggestions"
-              @blur="isAddingTag = false"
-            />
-            <button 
-              v-else 
-              @click="startAddingTag" 
-              class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
-              title="Add tag"
-            >+</button>
-          </div>
+          <!-- タグ追加ボタンを共通コンポーネントに置き換え -->
+          <TagAddButton 
+            :current-tags="currentTags"
+            @add-tag="addTag"
+          />
           
-          <div v-if="currentTags.length === 0 && !isAddingTag" class="text-sm text-gray-500 italic">
+          <div v-if="currentTags.length === 0" class="text-sm text-gray-500 italic">
             No tags
-          </div>
-        </div>
-        
-        <!-- サジェスト表示エリア -->
-        <div v-if="showSuggestions" class="absolute bg-white border border-gray-300 rounded-md mt-1 w-full z-10 max-h-40 overflow-y-auto shadow-md">
-          <div v-for="suggestion in tagSuggestions" :key="suggestion" class="px-3 py-1 hover:bg-gray-100 cursor-pointer" @click="selectSuggestion(suggestion)">
-            {{ suggestion }}
           </div>
         </div>
       </div>
@@ -91,10 +69,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
+import TagAddButton from '../../components/TagAddButton.vue';
 import { extractTags, addTagPrefix, removeTagFromTitle } from '../../utils/tagUtils';
-import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil, generateTagSuggestions } from '../../utils/bookmarkUtils';
+import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil } from '../../utils/bookmarkUtils';
 
 /** 現在のタブオブジェクト */
 const currentTab = ref<chrome.tabs.Tab | null>(null);
@@ -114,50 +93,10 @@ const loading = ref(true);
 /** ユーザーへのメッセージ */
 const message = ref('');
 
-/** 新しく追加するタグの入力値 */
-const newTag = ref('');
-
-/** タグ入力時のサジェスト候補リスト */
-const tagSuggestions = ref<string[]>([]);
-
-/** サジェスト表示フラグ */
-const showSuggestions = ref(false);
-
-/** タグ追加モード（入力フィールド表示）かどうか */
-const isAddingTag = ref(false);
-
-/** タグ入力フィールドのref */
-const tagInput = ref<HTMLInputElement | null>(null);
-
 /** タイトルから抽出した現在表示中のタグリスト */
 const currentTags = computed(() => {
   return extractTags(bookmarkTitle.value);
 });
-
-/** タグ入力に応じたサジェストを生成する */
-const filterSuggestions = async (): Promise<void> => {
-  if (!newTag.value) {
-    tagSuggestions.value = [];
-    showSuggestions.value = false;
-    return;
-  }
-
-  // utils/bookmarkUtils.tsの関数を使用
-  const suggestions = await generateTagSuggestions(newTag.value, currentTags.value);
-  tagSuggestions.value = suggestions;
-  showSuggestions.value = suggestions.length > 0;
-};
-
-/** サジェストからタグを選択して追加する
- * @param tag - 追加するタグ
- */
-const selectSuggestion = (tag: string): void => {
-  const tagToAdd = tag;
-  bookmarkTitle.value = `${bookmarkTitle.value} ${tagToAdd}`;
-  newTag.value = '';
-  showSuggestions.value = false;
-  tagSuggestions.value = [];
-};
 
 /** 現在のタブ情報を取得する */
 const getCurrentTab = async (): Promise<void> => {
@@ -180,38 +119,18 @@ const getCurrentTab = async (): Promise<void> => {
   }
 };
 
-/** タグの追加モードを開始する */
-const startAddingTag = async (): Promise<void> => {
-  isAddingTag.value = true;
-  newTag.value = '';
-  showSuggestions.value = false;
-  await nextTick();
-  tagInput.value?.focus();
-};
-
-/** 新しいタグをブックマークに追加する */
-const addTag = (): void => {
-  if (!newTag.value || newTag.value === '') {
-    isAddingTag.value = false;
-    return;
-  }
-  
-  // 先頭に@がなければ追加
-  const tagToAdd = addTagPrefix(newTag.value);
-  
+/** 新しいタグをブックマークに追加する
+ * @param tag - 追加するタグ
+ */
+const addTag = (tag: string): void => {
   // すでに同じタグがあれば追加しない
-  if (currentTags.value.includes(tagToAdd)) {
-    newTag.value = '';
-    isAddingTag.value = false;
-    showSuggestions.value = false;
+  const tagWithoutPrefix = tag.startsWith('@') ? tag.slice(1) : tag;
+  if (currentTags.value.includes(tagWithoutPrefix)) {
     return;
   }
   
   // タイトルにタグを追加
-  bookmarkTitle.value = `${bookmarkTitle.value} ${tagToAdd}`;
-  newTag.value = '';
-  isAddingTag.value = false;
-  showSuggestions.value = false;
+  bookmarkTitle.value = `${bookmarkTitle.value} ${tag}`;
 };
 
 /** 指定したタグをブックマークから削除する

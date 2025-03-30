@@ -51,3 +51,13 @@ export const mergeTags = (existingTags: string[], newTags: string[]): string[] =
 export const tagsToString = (tags: string[]): string => {
     return tags.join(' ');
 };
+
+/**
+ * タイトルから特定のタグを削除する
+ * @param title タイトル文字列
+ * @param tagToRemove 削除するタグ
+ * @returns タグが削除されたタイトル
+ */
+export const removeTagFromTitle = (title: string, tagToRemove: string): string => {
+    return title.replace(tagToRemove, '').replace(/\s+/g, ' ').trim();
+};
