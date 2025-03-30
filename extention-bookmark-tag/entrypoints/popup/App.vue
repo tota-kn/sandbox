@@ -114,8 +114,6 @@ onMounted(() => {
 
 <template>
   <div class="w-80 p-4 font-sans">
-    <h1 class="text-lg font-bold text-gray-800 mb-3">ブックマークタグ</h1>
-    
     <div v-if="loading" class="text-gray-600">
       読み込み中...
     </div>
