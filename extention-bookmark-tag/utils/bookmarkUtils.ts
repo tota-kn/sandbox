@@ -1,4 +1,5 @@
 import { extractTags } from './tagUtils';
+import { getCurrentTab, getTabUrl, getTabTitle } from './tabUtils';
 
 /**
  * 現在のタブのブックマーク情報を取得する
@@ -10,9 +11,8 @@ export const getCurrentTabBookmark = async (): Promise<{
     title: string;
 }> => {
     try {
-        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-        const currentTab = tabs[0] || null;
-        const url = currentTab?.url || '';
+        const currentTab = await getCurrentTab();
+        const url = getTabUrl(currentTab);
 
         // このURLがブックマークされているか確認
         const bookmarks = url ? await chrome.bookmarks.search({ url }) : [];
@@ -22,7 +22,7 @@ export const getCurrentTabBookmark = async (): Promise<{
             tab: currentTab,
             bookmark: currentBookmark,
             url,
-            title: currentBookmark?.title || currentTab?.title || '',
+            title: currentBookmark?.title || getTabTitle(currentTab) || '',
         };
     } catch (error) {
         console.error('タブ情報の取得に失敗しました:', error);

@@ -7,7 +7,7 @@ export default defineConfig({
     name: 'ブックマークタグ管理',
     description: 'ブックマークをタグで効率的に管理するための拡張機能',
     version: '1.0.0',
-    permissions: ['bookmarks'],
+    permissions: ['bookmarks', 'tabs'],
     options_ui: {
       page: 'options/index.html',
       // open_in_tab: true
