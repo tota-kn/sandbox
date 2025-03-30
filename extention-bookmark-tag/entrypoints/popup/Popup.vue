@@ -126,7 +126,7 @@ const isAddingTag = ref(false);
 const tagInput = ref<HTMLInputElement | null>(null);
 
 /** タグ入力に応じたサジェストを生成する */
-const filterSuggestions = async () => {
+const filterSuggestions = async (): Promise<void> => {
   if (!newTag.value) {
     tagSuggestions.value = [];
     showSuggestions.value = false;
@@ -142,7 +142,7 @@ const filterSuggestions = async () => {
 /** サジェストからタグを選択して追加する
  * @param tag - 追加するタグ
  */
-const selectSuggestion = (tag: string) => {
+const selectSuggestion = (tag: string): void => {
   const tagToAdd = tag;
   bookmarkTitle.value = `${bookmarkTitle.value} ${tagToAdd}`;
   newTag.value = '';
@@ -151,7 +151,7 @@ const selectSuggestion = (tag: string) => {
 };
 
 /** 現在のタブ情報を取得する */
-const getCurrentTab = async () => {
+const getCurrentTab = async (): Promise<void> => {
   try {
     loading.value = true;
     
@@ -172,7 +172,7 @@ const getCurrentTab = async () => {
 };
 
 /** タグの追加モードを開始する */
-const startAddingTag = async () => {
+const startAddingTag = async (): Promise<void> => {
   isAddingTag.value = true;
   newTag.value = '';
   showSuggestions.value = false;
@@ -181,7 +181,7 @@ const startAddingTag = async () => {
 };
 
 /** 新しいタグをブックマークに追加する */
-const addTag = () => {
+const addTag = (): void => {
   if (!newTag.value || newTag.value === '') {
     isAddingTag.value = false;
     return;
@@ -208,12 +208,12 @@ const addTag = () => {
 /** 指定したタグをブックマークから削除する
  * @param tag - 削除するタグ
  */
-const removeTag = (tag: string) => {
+const removeTag = (tag: string): void => {
   bookmarkTitle.value = removeTagFromTitle(bookmarkTitle.value, tag);
 };
 
 /** 既存のブックマークを更新する */
-const updateBookmark = async () => {
+const updateBookmark = async (): Promise<void> => {
   try {
     if (!currentBookmark.value || !currentBookmark.value.id) {
       throw new Error('Bookmark not found');
@@ -229,7 +229,7 @@ const updateBookmark = async () => {
 };
 
 /** 新しいブックマークを作成する */
-const createBookmark = async () => {
+const createBookmark = async (): Promise<void> => {
   try {
     // utils/bookmarkUtils.tsの関数を使用
     const result = await createBookmarkUtil(bookmarkTitle.value, bookmarkUrl.value);
@@ -251,7 +251,7 @@ const createBookmark = async () => {
 };
 
 /** ブックマークを保存（新規作成または更新）する */
-const saveBookmark = () => {
+const saveBookmark = (): void => {
   if (currentBookmark.value) {
     updateBookmark();
   } else {
@@ -260,7 +260,7 @@ const saveBookmark = () => {
 };
 
 /** ブックマークを削除する */
-const deleteBookmark = async () => {
+const deleteBookmark = async (): Promise<void> => {
   try {
     if (!currentBookmark.value || !currentBookmark.value.id) {
       throw new Error('Bookmark not found');
