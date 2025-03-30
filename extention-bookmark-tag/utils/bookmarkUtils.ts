@@ -7,15 +7,15 @@ import { getCurrentTab, getTabUrl, getTabTitle } from './tabUtils';
  */
 export interface ExtendedBookmark extends chrome.bookmarks.BookmarkTreeNode {
     /** フォルダかどうかのフラグ */
-    isFolder?: boolean 
+    isFolder?: boolean
     /** パス情報（フォルダ階層） */
-    path?: string[] 
+    path?: string[]
     /** 選択状態 */
-    selected?: boolean 
+    selected?: boolean
     /** フォルダの展開状態 */
-    expanded?: boolean 
+    expanded?: boolean
     /** フォルダの階層の深さ */
-    depth?: number 
+    depth?: number
 }
 
 /**
