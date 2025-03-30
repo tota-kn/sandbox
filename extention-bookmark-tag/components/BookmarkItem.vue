@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import { ref, nextTick, computed } from 'vue'
 import TagBadge from './TagBadge.vue'
+import { extractTags, createDisplayTitle, addTagPrefix, removeTagFromTitle, addTagToTitle } from '../utils/tagUtils'
 
 interface Bookmark {
   id: string
@@ -61,13 +62,6 @@ const isEditing = ref(false)
 const newTag = ref('')
 const tagInput = ref<HTMLInputElement | null>(null)
 
-// タイトルからタグを抽出する関数（@タグ形式）
-const extractTags = (title: string): string[] => {
-  const tagRegex = /(?:^|\s)(@[^\s]+)/g
-  const matches = [...title.matchAll(tagRegex)]
-  return matches.map(match => match[1])
-}
-
 // ブックマークのタグ一覧を計算
 const bookmarkTags = computed(() => {
   return extractTags(props.bookmark.title)
@@ -75,8 +69,7 @@ const bookmarkTags = computed(() => {
 
 // タグを除去したタイトルを表示用に計算
 const displayTitle = computed(() => {
-  // すべてのタグ (@xxx 形式) を削除し、余分な空白を整理
-  return props.bookmark.title.replace(/\s?@[^\s]+\s?/g, ' ').trim()
+  return createDisplayTitle(props.bookmark.title)
 })
 
 // タグ編集を開始する
@@ -94,13 +87,11 @@ const addTag = async () => {
     return
   }
   
-  const formattedTag = newTag.value.trim().startsWith('@') 
-    ? newTag.value.trim() 
-    : `@${newTag.value.trim()}`
+  const formattedTag = addTagPrefix(newTag.value.trim())
     
   if (!bookmarkTags.value.includes(formattedTag)) {
     // タグが存在しない場合のみ追加する
-    const updatedTitle = `${props.bookmark.title} ${formattedTag}`
+    const updatedTitle = addTagToTitle(props.bookmark.title, formattedTag)
     emit('updateTitle', props.bookmark.id, updatedTitle)
   }
   
@@ -111,7 +102,7 @@ const addTag = async () => {
 // タグを削除する
 const removeTag = async (tagToRemove: string) => {
   // タイトルからタグを削除
-  const updatedTitle = props.bookmark.title.replace(tagToRemove, '').replace(/\s+/g, ' ').trim()
+  const updatedTitle = removeTagFromTitle(props.bookmark.title, tagToRemove)
   emit('updateTitle', props.bookmark.id, updatedTitle)
 }
 </script>

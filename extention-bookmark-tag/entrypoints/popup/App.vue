@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
+import { extractTags, addTagPrefix, removeTagFromTitle } from '../../utils/tagUtils';
 
 // 現在のタブ情報
 const currentTab = ref<chrome.tabs.Tab | null>(null);
@@ -9,13 +10,6 @@ const bookmarkTitle = ref('');
 const bookmarkUrl = ref('');
 const loading = ref(true);
 const message = ref('');
-
-// タイトルからタグを抽出する関数（@タグ形式）
-const extractTags = (title: string): string[] => {
-  const tagRegex = /(?:^|\s)(@[^\s]+)/g;
-  const matches = [...title.matchAll(tagRegex)];
-  return matches.map(match => match[1]);
-};
 
 // 表示中のタグ
 const currentTags = computed(() => {
@@ -115,7 +109,7 @@ const addTag = () => {
   }
   
   // 先頭に@がなければ追加
-  const tagToAdd = newTag.value.startsWith('@') ? newTag.value : `@${newTag.value}`;
+  const tagToAdd = addTagPrefix(newTag.value);
   
   // すでに同じタグがあれば追加しない
   if (currentTags.value.includes(tagToAdd)) {
@@ -134,53 +128,82 @@ const addTag = () => {
 
 // タグを削除
 const removeTag = (tag: string) => {
-  bookmarkTitle.value = bookmarkTitle.value.replace(tag, '').replace(/\s+/g, ' ').trim();
+  bookmarkTitle.value = removeTagFromTitle(bookmarkTitle.value, tag);
 };
 
-// ブックマークを保存または更新
-const saveBookmark = async () => {
+// 既存のブックマークを更新
+const updateBookmark = async () => {
   try {
-    if (currentBookmark.value) {
-      // 既存ブックマークの更新
-      await chrome.bookmarks.update(currentBookmark.value.id, {
-        title: bookmarkTitle.value
-      });
-      message.value = 'Bookmark updated';
-    } else {
-      // 新規ブックマーク作成
-      await chrome.bookmarks.create({
-        title: bookmarkTitle.value,
-        url: bookmarkUrl.value
-      });
-      message.value = 'Bookmark added';
-      
-      // ブックマーク状態を更新
-      const bookmarks = await chrome.bookmarks.search({ url: bookmarkUrl.value });
-      if (bookmarks && bookmarks.length > 0) {
-        currentBookmark.value = bookmarks[0];
-      }
+    if (!currentBookmark.value || !currentBookmark.value.id) {
+      throw new Error('Bookmark not found');
     }
+    
+    await chrome.bookmarks.update(currentBookmark.value.id, {
+      title: bookmarkTitle.value
+    });
+    
+    message.value = 'Updated';
   } catch (error) {
-    console.error('ブックマークの保存に失敗しました:', error);
+    console.error('ブックマークの更新に失敗しました:', error);
     message.value = 'Error occurred';
+  }
+};
+
+// 新しいブックマークを作成
+const createBookmark = async () => {
+  try {
+    // デフォルトのブックマークフォルダを使用
+    const bookmarkTree = await chrome.bookmarks.getTree();
+    const defaultFolder = bookmarkTree[0].children?.[1]?.id; // 通常はブックマークバー
+    
+    if (!defaultFolder) {
+      throw new Error('Default folder not found');
+    }
+    
+    await chrome.bookmarks.create({
+      parentId: defaultFolder,
+      title: bookmarkTitle.value,
+      url: bookmarkUrl.value
+    });
+    
+    message.value = 'Bookmarked';
+    
+    // 再度情報を取得して更新
+    await getCurrentTab();
+  } catch (error) {
+    console.error('ブックマークの作成に失敗しました:', error);
+    message.value = 'Error occurred';
+  }
+};
+
+// ブックマークを保存（新規作成または更新）
+const saveBookmark = () => {
+  if (currentBookmark.value) {
+    updateBookmark();
+  } else {
+    createBookmark();
   }
 };
 
 // ブックマークを削除
 const deleteBookmark = async () => {
-  if (currentBookmark.value) {
-    try {
-      await chrome.bookmarks.remove(currentBookmark.value.id);
-      message.value = 'Bookmark deleted';
-      currentBookmark.value = null;
-    } catch (error) {
-      console.error('ブックマークの削除に失敗しました:', error);
-      message.value = 'Error occurred';
+  try {
+    if (!currentBookmark.value || !currentBookmark.value.id) {
+      throw new Error('Bookmark not found');
     }
+    
+    await chrome.bookmarks.remove(currentBookmark.value.id);
+    
+    // 状態リセット
+    currentBookmark.value = null;
+    message.value = 'Removed';
+  } catch (error) {
+    console.error('ブックマークの削除に失敗しました:', error);
+    message.value = 'Error occurred';
   }
 };
 
-// コンポーネントのマウント時に現在のタブ情報を取得
+// コンポーネントのマウント時にタブ情報を取得
 onMounted(() => {
   getCurrentTab();
 });

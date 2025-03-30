@@ -72,6 +72,7 @@ import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
 import BookmarkItem from '../../components/BookmarkItem.vue'
 import SearchBox from '../../components/SearchBox.vue'
+import { extractTags } from '../../utils/tagUtils'
 
 // ブックマークの型定義
 interface Bookmark {
@@ -117,13 +118,6 @@ const flattenBookmarks = (bookmarkItems: Bookmark[]): Bookmark[] => {
   }
   
   return result
-}
-
-// タイトルからタグを抽出する関数（@タグ形式）
-const extractTags = (title: string): string[] => {
-  const tagRegex = /(?:^|\s)(@[^\s]+)/g
-  const matches = [...title.matchAll(tagRegex)]
-  return matches.map(match => match[1])
 }
 
 // タグを切り替える

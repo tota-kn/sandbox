@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import { computed, ref, nextTick } from 'vue'
+import { removeTagPrefix, addTagPrefix } from '../utils/tagUtils'
 
 const props = defineProps<{
   tag: string
@@ -55,7 +56,7 @@ const inputRef = ref<HTMLInputElement | null>(null)
 
 // @マークを削除して表示する
 const displayTag = computed(() => {
-  return props.tag.startsWith('@') ? props.tag.substring(1) : props.tag
+  return removeTagPrefix(props.tag)
 })
 
 // 編集モードを開始
@@ -78,7 +79,7 @@ const saveEdit = () => {
     const newValue = editingValue.value.trim()
     if (newValue && newValue !== displayTag.value) {
       // @を追加
-      const formattedNewTag = newValue.startsWith('@') ? newValue : `@${newValue}`
+      const formattedNewTag = addTagPrefix(newValue)
       emits('edit', props.tag, formattedNewTag)
     }
     isEditing.value = false
