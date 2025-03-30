@@ -24,6 +24,49 @@ const currentTags = computed(() => {
 
 // 新しいタグ
 const newTag = ref('');
+// タグサジェスト用の変数
+const tagSuggestions = ref<string[]>([]);
+const showSuggestions = ref(false);
+
+// タグ入力に応じたサジェストを生成
+const filterSuggestions = () => {
+  if (!newTag.value) {
+    tagSuggestions.value = [];
+    showSuggestions.value = false;
+    return;
+  }
+
+  const input = newTag.value.toLowerCase().replace(/^@/, '');
+  // すでに存在するタグから検索クエリに一致するものをフィルタリング
+  const allExistingTags = chrome.bookmarks.search({}).then(allBookmarks => {
+    const tagSet = new Set<string>();
+    
+    allBookmarks.forEach(bookmark => {
+      const tags = extractTags(bookmark.title || '');
+      tags.forEach(tag => {
+        // @を除いた部分で比較
+        const tagText = tag.slice(1).toLowerCase();
+        if (tagText.includes(input)) {
+          tagSet.add(tag);
+        }
+      });
+    });
+    
+    // 現在すでに選択されているタグは除外
+    const filteredTags = Array.from(tagSet).filter(tag => !currentTags.value.includes(tag));
+    tagSuggestions.value = filteredTags;
+    showSuggestions.value = filteredTags.length > 0;
+  });
+};
+
+// サジェストからタグを選択
+const selectSuggestion = (tag: string) => {
+  const tagToAdd = tag;
+  bookmarkTitle.value = `${bookmarkTitle.value} ${tagToAdd}`;
+  newTag.value = '';
+  showSuggestions.value = false;
+  tagSuggestions.value = [];
+};
 
 // 現在のタブ情報を取得
 const getCurrentTab = async () => {
@@ -64,12 +107,14 @@ const addTag = () => {
   // すでに同じタグがあれば追加しない
   if (currentTags.value.includes(tagToAdd)) {
     newTag.value = '';
+    showSuggestions.value = false;
     return;
   }
   
   // タイトルにタグを追加
   bookmarkTitle.value = `${bookmarkTitle.value} ${tagToAdd}`;
   newTag.value = '';
+  showSuggestions.value = false;
 };
 
 // タグを削除
@@ -132,7 +177,7 @@ onMounted(() => {
         />
       </div>
       
-      <div class="mb-4">
+      <div class="mb-4 relative">
         <label class="block text-sm font-medium text-gray-700 mb-1">タグ</label>
         <div class="flex flex-wrap gap-2 mb-2">
           <TagBadge 
@@ -161,6 +206,7 @@ onMounted(() => {
             placeholder="新しいタグ" 
             class="flex-grow px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             @keyup.enter="addTag"
+            @input="filterSuggestions"
           />
           <button 
             @click="addTag"
@@ -168,6 +214,11 @@ onMounted(() => {
           >
             追加
           </button>
+        </div>
+        <div v-if="showSuggestions" class="absolute bg-white border border-gray-300 rounded-md mt-1 w-full z-10 max-h-40 overflow-y-auto shadow-md">
+          <div v-for="suggestion in tagSuggestions" :key="suggestion" class="px-3 py-1 hover:bg-gray-100 cursor-pointer" @click="selectSuggestion(suggestion)">
+            {{ suggestion }}
+          </div>
         </div>
       </div>
       
