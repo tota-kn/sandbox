@@ -37,12 +37,6 @@
           @toggle="toggleTag(tag)"
           @edit="handleTagEdit"
         />
-        
-        <!-- タグ追加ボタンを共通コンポーネントに置き換え -->
-        <TagAddButton 
-          :current-tags="uniqueTags"
-          @add-tag="addGlobalTag"
-        />
       </div>
     </div>
     
@@ -418,11 +412,4 @@ const removeTagFromBatch = async (tagInput: string): Promise<void> => {
     loading.value = false
   }
 }
-
-/**
- * 新しいグローバルタグを追加する
- * @param {string} tag - 追加するタグ
- */
-const addGlobalTag = async (tag: string): Promise<void> => {
-};
 </script>
