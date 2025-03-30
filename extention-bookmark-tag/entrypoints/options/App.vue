@@ -25,19 +25,13 @@
         </label>
       </div>
       <div class="flex flex-wrap gap-2">
-        <span 
+        <TagBadge 
           v-for="tag in uniqueTags" 
           :key="tag"
-          @click="toggleTag(tag)" 
-          :class="[
-            'px-3 py-1 rounded-full text-sm cursor-pointer transition-colors',
-            selectedTags.includes(tag) 
-              ? 'bg-blue-500 text-white' 
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          ]"
-        >
-          {{ tag }}
-        </span>
+          :tag="tag"
+          :selected="selectedTags.includes(tag)"
+          @toggle="toggleTag(tag)"
+        />
       </div>
     </div>
     
@@ -55,14 +49,14 @@
             </div>
             <div class="flex flex-row items-center justify-end gap-2 flex-1 min-w-[200px] max-w-full sm:max-w-[50%]">
               <div class="flex flex-wrap gap-1 items-center justify-end">
-                <span 
+                <TagBadge 
                   v-for="tag in extractTags(bookmark.title)" 
-                  :key="tag" 
-                  class="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-full flex items-center"
+                  :key="tag"
+                  :tag="tag"
+                  :selected="false"
                 >
-                  {{ tag }}
                   <span class="cursor-pointer ml-1 font-bold text-gray-500 hover:text-red-600" @click.stop="removeTag(bookmark, tag)">×</span>
-                </span>
+                </TagBadge>
               </div>
               <div class="inline-flex items-center">
                 <input 
@@ -90,6 +84,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
+import TagBadge from '../../components/TagBadge.vue'
 
 // ブックマークの型定義
 interface Bookmark {
