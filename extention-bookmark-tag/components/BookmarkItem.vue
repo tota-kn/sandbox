@@ -57,6 +57,10 @@
                 :tag="tag"
                 size="small"
               />
+              <TagAddButton 
+                :current-tags="bookmarkTags"
+                @add-tag="addNewTag"
+              />
             </div>
           </div>
         </div>
@@ -68,6 +72,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
+import TagAddButton from './TagAddButton.vue'
 import { extractTags } from '../utils/tagUtils'
 
 /**
@@ -150,5 +155,21 @@ const saveEdit = (): void => {
     emit('update-title', props.bookmark.id, newTitle)
   }
   isEditing.value = false
+}
+
+/**
+ * 新しいタグを追加する
+ * @param {string} tag 追加するタグ
+ * @returns {void}
+ */
+const addNewTag = (tag: string): void => {
+  // 同じタグがすでにある場合は追加しない
+  if (bookmarkTags.value.includes(tag)) {
+    return
+  }
+  
+  // 現在のタイトルにタグを追加して更新
+  const newTitle = `${props.bookmark.title} ${tag}`
+  emit('update-title', props.bookmark.id, newTitle)
 }
 </script>
