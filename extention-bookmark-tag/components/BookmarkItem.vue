@@ -104,7 +104,12 @@ const props = withDefaults(defineProps<BookmarkProps>(), {
 })
 
 /** 親コンポーネントに通知するイベント */
-const emit = defineEmits(['update-title', 'toggle-select'])
+const emit = defineEmits<{
+  /** ブックマークタイトル更新イベント */
+  (e: 'update-title', newTitle: string): void
+  /** ブックマーク選択状態変更イベント */
+  (e: 'toggle-select'): void
+}>()
 
 /** 編集モードかどうかのフラグ */
 const isEditing = ref(false)

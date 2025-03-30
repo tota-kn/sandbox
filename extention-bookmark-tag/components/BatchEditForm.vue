@@ -53,9 +53,15 @@ const props = defineProps<{
  * 親コンポーネントに通知するイベント
  */
 const emit = defineEmits<{
-  /** タグ追加イベント */
-  (e: 'add-tag', tag: string): void
-  /** タグ削除イベント */
+  /**
+   * タグ追加イベント
+   * @param tag 追加するタグ
+   */
+  (e: 'add-tag', tag: string): void,
+  /**
+   * タグ削除イベント
+   * @param tag 削除するタグ
+   */
   (e: 'remove-tag', tag: string): void
 }>()
 

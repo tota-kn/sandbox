@@ -50,12 +50,18 @@ const props = defineProps<{
 }>()
 
 /**
- * コンポーネントから発行されるイベント定義
+ * 親コンポーネントに通知するイベント
  */
-const emits = defineEmits<{
-  /** タグの選択状態切り替えイベント */
-  (e: 'toggle'): void
-  /** タグ編集イベント */
+const emit = defineEmits<{
+  /**
+   * タグ選択切り替えイベント
+   */
+  (e: 'toggle'): void,
+  /**
+   * タグ編集イベント
+   * @param oldTag 元のタグ名
+   * @param newTag 新しいタグ名
+   */
   (e: 'edit', oldTag: string, newTag: string): void
 }>()
 
@@ -103,7 +109,7 @@ const saveEdit = (): void => {
     if (newValue && newValue !== displayTag.value) {
       // @を追加
       const formattedNewTag = addTagPrefix(newValue)
-      emits('edit', props.tag, formattedNewTag)
+      emit('edit', props.tag, formattedNewTag)
     }
     isEditing.value = false
   }

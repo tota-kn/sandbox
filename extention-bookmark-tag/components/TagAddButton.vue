@@ -66,11 +66,16 @@ const props = withDefaults(defineProps<Props>(), {
   suggestionsPosition: () => ({})
 });
 
-/** イベント定義 */
+/**
+ * 親コンポーネントに通知するイベント
+ */
 const emit = defineEmits<{
-  /** タグ追加イベント */
-  (e: 'add-tag', tag: string): void;
-}>();
+  /**
+   * タグ追加イベント
+   * @param tag 追加するタグ（@プレフィックス付き）
+   */
+  (e: 'add-tag', tag: string): void
+}>()
 
 /** タグ入力中かどうかのフラグ */
 const isAddingTag = ref(false);
