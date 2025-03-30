@@ -51,7 +51,15 @@
                     :key="tag"
                     :tag="tag"
                     size="small"
-                  />
+                  >
+                    <button 
+                      @click.stop="removeTag(tag)" 
+                      class="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                      title="Remove tag"
+                    >
+                      ×
+                    </button>
+                  </TagBadge>
                   <TagAddButton 
                     :current-tags="bookmarkTags"
                     @add-tag="addNewTag"
@@ -80,7 +88,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
 import TagAddButton from './TagAddButton.vue'
 import EditIcon from './EditIcon.vue'
-import { extractTags } from '../utils/tagUtils'
+import { extractTags, addTagPrefix, removeTagFromTitle } from '../utils/tagUtils'
 
 /**
  * ブックマークアイテムのプロパティ定義
@@ -182,6 +190,17 @@ const addNewTag = (tag: string): void => {
   
   // 現在のタイトルにタグを追加して更新
   const newTitle = `${props.bookmark.title} ${tag}`
+  emit('update-title', newTitle)
+}
+
+/**
+ * タグを削除する
+ * @param {string} tag 削除するタグ
+ * @returns {void}
+ */
+const removeTag = (tag: string): void => {
+  // タグを削除して更新
+  const newTitle = removeTagFromTitle(props.bookmark.title, tag)
   emit('update-title', newTitle)
 }
 </script>
