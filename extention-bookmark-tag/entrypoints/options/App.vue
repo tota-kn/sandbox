@@ -6,7 +6,7 @@
       <div class="flex items-center mb-3">
         <h2 class="text-xl font-semibold mr-4">タグ一覧</h2>
         <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">検索モード：</span>
+          <span class="text-sm text-gray-600">絞り込み：</span>
           <label class="inline-flex items-center gap-1 cursor-pointer">
             <input type="radio" v-model="searchMode" value="or" class="form-radio text-blue-600" />
             <span class="text-sm">OR</span>
