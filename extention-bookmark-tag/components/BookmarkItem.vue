@@ -37,31 +37,36 @@
         <!-- 表示モード -->
         <div v-else class="flex items-start">
           <div class="flex-1">
-            <div class="flex items-center">
-              <h3 class="text-base font-medium mb-1 mr-2">
-                {{ displayTitle }}
-              </h3>
+            <div class="flex justify-between items-center">
+              <!-- タイトルとタグを左に配置 -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-base font-medium">
+                  {{ displayTitle }}
+                </h3>
+                
+                <!-- タグ -->
+                <div class="flex flex-wrap gap-1">
+                  <TagBadge
+                    v-for="tag in bookmarkTags"
+                    :key="tag"
+                    :tag="tag"
+                    size="small"
+                  />
+                  <TagAddButton 
+                    :current-tags="bookmarkTags"
+                    @add-tag="addNewTag"
+                  />
+                </div>
+              </div>
+
+              <!-- 編集ボタンを右に配置 -->
               <button 
                 @click="startEdit" 
-                class="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+                class="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 ml-2 shrink-0"
                 title="編集"
               >
                 <EditIcon />
               </button>
-            </div>
-            
-            <!-- タグ -->
-            <div class="flex flex-wrap gap-1">
-              <TagBadge
-                v-for="tag in bookmarkTags"
-                :key="tag"
-                :tag="tag"
-                size="small"
-              />
-              <TagAddButton 
-                :current-tags="bookmarkTags"
-                @add-tag="addNewTag"
-              />
             </div>
           </div>
         </div>
