@@ -159,7 +159,7 @@ const cancelEdit = (): void => {
 const saveEdit = (): void => {
   const newTitle = editTitle.value.trim()
   if (newTitle && newTitle !== props.bookmark.title) {
-    emit('update-title', props.bookmark.id, newTitle)
+    emit('update-title', newTitle)
   }
   isEditing.value = false
 }
@@ -177,6 +177,6 @@ const addNewTag = (tag: string): void => {
   
   // 現在のタイトルにタグを追加して更新
   const newTitle = `${props.bookmark.title} ${tag}`
-  emit('update-title', props.bookmark.id, newTitle)
+  emit('update-title', newTitle)
 }
 </script>
