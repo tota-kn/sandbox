@@ -1,44 +1,32 @@
 <template>
-  <span 
-    @click="$emit('toggle')"
+  <div 
     :class="[
-      // 共通スタイル
-      'px-3',
-      'py-1',
-      'rounded-full',
-      'text-sm',
-      'cursor-pointer',
-      'transition-all',
-      'duration-200',
-      'inline-block',
-      
-      // 選択状態に応じたスタイル
-      props.selected ? [
-        'bg-blue-500',
-        'text-white',
-        'border',
-        'border-blue-600'
-      ] : [
-        'bg-blue-100',
-        'text-blue-700',
-        'border',
-        'border-blue-200',
-        'hover:bg-blue-200'
-      ]
+      'px-2 py-1 rounded-full text-xs font-medium flex items-center',
+      selected 
+        ? 'bg-blue-100 text-blue-800 border border-blue-300'
+        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
     ]"
+    @click="$emit('toggle')"
   >
-    {{ props.tag }}
+    {{ displayTag }}
     <slot></slot>
-  </span>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 const props = defineProps<{
-  tag: string;
-  selected: boolean;
-}>();
+  tag: string
+  selected?: boolean
+}>()
 
 defineEmits<{
-  (e: 'toggle'): void;
-}>();
+  (e: 'toggle'): void
+}>()
+
+// @マークを削除して表示する
+const displayTag = computed(() => {
+  return props.tag.startsWith('@') ? props.tag.substring(1) : props.tag
+})
 </script>

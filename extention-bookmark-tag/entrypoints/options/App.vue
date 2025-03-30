@@ -42,49 +42,21 @@
         表示するブックマークがありません
       </div>
       <ul v-else class="list-none p-0">
-        <li v-for="bookmark in filteredBookmarks" :key="bookmark.id" class="py-3 border-b border-gray-100">
-          <div class="flex flex-col sm:flex-row justify-between gap-3 w-full">
-            <div class="flex-1 min-w-[200px] max-w-full sm:max-w-[50%] truncate">
-              <a :href="bookmark.url" target="_blank" class="text-blue-600 font-medium hover:underline">{{ bookmark.title }}</a>
-            </div>
-            <div class="flex flex-row items-center justify-end gap-2 flex-1 min-w-[200px] max-w-full sm:max-w-[50%]">
-              <div class="flex flex-wrap gap-1 items-center justify-end">
-                <TagBadge 
-                  v-for="tag in extractTags(bookmark.title)" 
-                  :key="tag"
-                  :tag="tag"
-                  :selected="false"
-                >
-                  <span class="cursor-pointer ml-1 font-bold text-gray-500 hover:text-red-600" @click.stop="removeTag(bookmark, tag)">×</span>
-                </TagBadge>
-              </div>
-              <div class="inline-flex items-center">
-                <input 
-                  v-if="editingBookmarkId === bookmark.id" 
-                  v-model="newTag" 
-                  @keyup.enter="addTag(bookmark)" 
-                  placeholder="新しいタグ" 
-                  class="border border-gray-300 rounded-full text-xs p-1 px-2 w-28 focus:outline-none focus:ring-1 focus:ring-blue-500" 
-                  ref="tagInput"
-                  @blur="editingBookmarkId = null"
-                />
-                <button 
-                  v-else 
-                  @click="startTagEdit(bookmark)" 
-                  class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-sm"
-                >+</button>
-              </div>
-            </div>
-          </div>
-        </li>
+        <BookmarkItem 
+          v-for="bookmark in filteredBookmarks"
+          :key="bookmark.id"
+          :bookmark="bookmark"
+          @update-title="updateBookmarkTitle"
+        />
       </ul>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
+import BookmarkItem from '../../components/BookmarkItem.vue'
 
 // ブックマークの型定義
 interface Bookmark {
@@ -99,9 +71,6 @@ const loading = ref(true)
 const searchQuery = ref('')
 const selectedTags = ref<string[]>([])
 const searchMode = ref<'and' | 'or'>('or')
-const editingBookmarkId = ref<string | null>(null)
-const newTag = ref('')
-const tagInput = ref<HTMLInputElement | null>(null)
 
 // ブックマークを取得する関数
 const fetchBookmarks = async () => {
@@ -187,62 +156,23 @@ const uniqueTags = computed(() => {
   return [...new Set(allTags)]
 })
 
-// タグ編集を開始する
-const startTagEdit = async (bookmark: Bookmark) => {
-  editingBookmarkId.value = bookmark.id
-  newTag.value = ''
-  await nextTick()
-  tagInput.value?.focus()
-}
-
-// タグを追加する
-const addTag = async (bookmark: Bookmark) => {
-  if (!newTag.value.trim()) {
-    editingBookmarkId.value = null
-    return
-  }
-  
-  const formattedTag = newTag.value.trim().startsWith('@') 
-    ? newTag.value.trim() 
-    : `@${newTag.value.trim()}`
-    
-  if (!extractTags(bookmark.title).includes(formattedTag)) {
-    // タグが存在しない場合のみ追加する
-    const updatedTitle = `${bookmark.title} ${formattedTag}`
-    
-    try {
-      await chrome.bookmarks.update(bookmark.id, {
-        title: updatedTitle
-      })
-      
-      // ローカルのブックマークデータを更新
-      bookmark.title = updatedTitle
-    } catch (error) {
-      console.error('ブックマークの更新に失敗しました:', error)
-    }
-  }
-  
-  newTag.value = ''
-  editingBookmarkId.value = null
-}
-
-// タグを削除する
-const removeTag = async (bookmark: Bookmark, tagToRemove: string) => {
-  // タイトルからタグを削除
-  const updatedTitle = bookmark.title.replace(tagToRemove, '').replace(/\s+/g, ' ').trim()
-  
+// ブックマークのタイトルを更新する
+const updateBookmarkTitle = async (bookmarkId: string, newTitle: string) => {
   try {
-    await chrome.bookmarks.update(bookmark.id, {
-      title: updatedTitle
+    await chrome.bookmarks.update(bookmarkId, {
+      title: newTitle
     })
     
     // ローカルのブックマークデータを更新
-    bookmark.title = updatedTitle
+    const bookmark = bookmarks.value.find(b => b.id === bookmarkId)
+    if (bookmark) {
+      bookmark.title = newTitle
+    }
     
     // 選択中のタグが削除された場合、フィルターをクリア
-    if (selectedTags.value.includes(tagToRemove)) {
-      selectedTags.value = selectedTags.value.filter(tag => tag !== tagToRemove)
-    }
+    const currentTags = extractTags(newTitle)
+    selectedTags.value = selectedTags.value.filter(tag => currentTags.includes(tag) || 
+      bookmarks.value.some(b => b.id !== bookmarkId && extractTags(b.title).includes(tag)))
   } catch (error) {
     console.error('ブックマークの更新に失敗しました:', error)
   }
