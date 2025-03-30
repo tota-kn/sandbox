@@ -1,38 +1,64 @@
 <template>
-  <li class="py-3 border-b border-gray-100">
+  <li class="border-b last:border-b-0 py-3">
     <div class="flex items-start">
-      <!-- ブックマークタイトルとタグを並べる親コンテナ -->
-      <div class="flex flex-wrap items-center gap-1">
-        <!-- ブックマークタイトル (タグを除去して表示) -->
-        <a :href="bookmark.url" target="_blank" class="text-blue-600 font-medium hover:underline mr-1">{{ displayTitle }}</a>
-        
-        <!-- タグ一覧 -->
-        <TagBadge 
-          v-for="tag in bookmarkTags" 
-          :key="tag"
-          :tag="tag"
-          :selected="false"
-          class="mr-1"
-        >
-          <span class="cursor-pointer ml-1 font-bold text-gray-500 hover:text-red-600" @click.stop="removeTag(tag)">×</span>
-        </TagBadge>
-        
-        <!-- タグ追加ボタン -->
-        <div class="inline-flex items-center">
+      <!-- 選択チェックボックス -->
+      <div v-if="selectable" class="mr-3 mt-1">
+        <input 
+          type="checkbox" 
+          :checked="selected" 
+          @change="$emit('toggle-select')"
+          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+        />
+      </div>
+      
+      <div class="flex-1 min-w-0">
+        <!-- 編集モード -->
+        <div v-if="isEditing" class="flex items-center gap-2 mb-1">
           <input 
-            v-if="isEditing" 
-            v-model="newTag" 
-            @keyup.enter="addTag" 
-            placeholder="New tag" 
-            class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
-            ref="tagInput"
-            @blur="isEditing = false"
+            v-model="editTitle" 
+            class="flex-1 px-2 py-1 border rounded text-sm"
+            @keyup.enter="saveEdit"
+            ref="titleInput"
           />
           <button 
-            v-else 
-            @click="startTagEdit" 
-            class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
-          >+</button>
+            @click="saveEdit" 
+            class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
+          >
+            保存
+          </button>
+          <button 
+            @click="cancelEdit" 
+            class="px-2 py-1 text-xs bg-gray-300 rounded"
+          >
+            キャンセル
+          </button>
+        </div>
+        
+        <!-- 表示モード -->
+        <div v-else class="group flex items-start">
+          <div class="flex-1">
+            <div class="flex items-center">
+              <h3 class="text-base font-medium mb-1 mr-2">
+                {{ displayTitle }}
+              </h3>
+              <button 
+                @click="startEdit" 
+                class="px-2 py-0.5 text-xs bg-gray-100 hover:bg-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                編集
+              </button>
+            </div>
+            
+            <!-- タグ -->
+            <div class="flex flex-wrap gap-1">
+              <TagBadge
+                v-for="tag in bookmarkTags"
+                :key="tag"
+                :tag="tag"
+                size="small"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -40,69 +66,68 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, computed } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
-import { extractTags, createDisplayTitle, addTagPrefix, removeTagFromTitle, addTagToTitle } from '../utils/tagUtils'
+import { extractTags } from '../utils/tagUtils'
 
-interface Bookmark {
-  id: string
-  title: string
-  url?: string
+interface BookmarkProps {
+  bookmark: {
+    id: string
+    title: string
+    url?: string
+  }
+  selectable?: boolean  // 選択可能かどうか
+  selected?: boolean   // 選択状態
 }
 
-const props = defineProps<{
-  bookmark: Bookmark
-}>()
+const props = withDefaults(defineProps<BookmarkProps>(), {
+  selectable: false,
+  selected: false
+})
 
-const emit = defineEmits<{
-  (e: 'updateTitle', bookmarkId: string, newTitle: string): void
-}>()
+// 親コンポーネントに通知するイベント
+const emit = defineEmits(['update-title', 'toggle-select'])
 
+// 編集関連の状態
 const isEditing = ref(false)
-const newTag = ref('')
-const tagInput = ref<HTMLInputElement | null>(null)
+const editTitle = ref('')
+const titleInput = ref<HTMLInputElement | null>(null)
 
-// ブックマークのタグ一覧を計算
+// タイトルからタグを除外した表示用タイトル
+const displayTitle = computed(() => {
+  // タグを除外したタイトルを返す処理
+  const title = props.bookmark.title
+  return title.replace(/@\S+/g, '').trim()
+})
+
+// ブックマークに含まれるタグの配列
 const bookmarkTags = computed(() => {
   return extractTags(props.bookmark.title)
 })
 
-// タグを除去したタイトルを表示用に計算
-const displayTitle = computed(() => {
-  return createDisplayTitle(props.bookmark.title)
-})
-
-// タグ編集を開始する
-const startTagEdit = async () => {
+// 編集モードの開始
+const startEdit = () => {
+  editTitle.value = props.bookmark.title
   isEditing.value = true
-  newTag.value = ''
-  await nextTick()
-  tagInput.value?.focus()
+  
+  // 入力フォームにフォーカス
+  nextTick(() => {
+    titleInput.value?.focus()
+  })
 }
 
-// タグを追加する
-const addTag = async () => {
-  if (!newTag.value.trim()) {
-    isEditing.value = false
-    return
-  }
-  
-  const formattedTag = addTagPrefix(newTag.value.trim())
-    
-  if (!bookmarkTags.value.includes(formattedTag)) {
-    // タグが存在しない場合のみ追加する
-    const updatedTitle = addTagToTitle(props.bookmark.title, formattedTag)
-    emit('updateTitle', props.bookmark.id, updatedTitle)
-  }
-  
-  newTag.value = ''
+// 編集のキャンセル
+const cancelEdit = () => {
   isEditing.value = false
+  editTitle.value = ''
 }
 
-// タグを削除する
-const removeTag = async (tagToRemove: string) => {
-  // タイトルからタグを削除
-  const updatedTitle = removeTagFromTitle(props.bookmark.title, tagToRemove)
-  emit('updateTitle', props.bookmark.id, updatedTitle)
+// 編集内容の保存
+const saveEdit = () => {
+  const newTitle = editTitle.value.trim()
+  if (newTitle && newTitle !== props.bookmark.title) {
+    emit('update-title', props.bookmark.id, newTitle)
+  }
+  isEditing.value = false
 }
 </script>

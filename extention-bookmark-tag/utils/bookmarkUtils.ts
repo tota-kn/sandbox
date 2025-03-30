@@ -1,6 +1,15 @@
 import { extractTags } from './tagUtils';
 import { getCurrentTab, getTabUrl, getTabTitle } from './tabUtils';
 
+// ブックマークの拡張型定義
+export interface ExtendedBookmark extends chrome.bookmarks.BookmarkTreeNode {
+  isFolder?: boolean // フォルダかどうかのフラグ
+  path?: string[] // パス情報（フォルダ階層）
+  selected?: boolean // 選択状態
+  expanded?: boolean // フォルダの展開状態
+  depth?: number // フォルダの階層の深さ
+}
+
 /**
  * 現在のタブのブックマーク情報を取得する
  */
@@ -135,20 +144,75 @@ export const generateTagSuggestions = async (
 };
 
 /**
- * ブックマークツリーを平坦化する
+ * Chrome APIからのブックマークツリーを平坦化する
+ * @param bookmarkNodes ブックマークツリー
+ * @param path 現在のパス
+ * @param depth 現在の深さ
+ * @returns 拡張したブックマークの配列
  */
-export const flattenBookmarks = (bookmarkItems: chrome.bookmarks.BookmarkTreeNode[]): chrome.bookmarks.BookmarkTreeNode[] => {
-    let result: chrome.bookmarks.BookmarkTreeNode[] = [];
+export const flattenBookmarks = (
+  bookmarkNodes: chrome.bookmarks.BookmarkTreeNode[],
+  path: string[] = [],
+  depth: number = 0
+): ExtendedBookmark[] => {
+  const result: ExtendedBookmark[] = [];
 
-    for (const item of bookmarkItems) {
-        if (item.url) {
-            result.push(item);
-        }
-
-        if (item.children) {
-            result = result.concat(flattenBookmarks(item.children));
-        }
+  for (const node of bookmarkNodes) {
+    const isFolder = !node.url;
+    const currentPath = [...path];
+    
+    // フォルダの場合はパスに追加
+    if (isFolder && node.title) {
+      currentPath.push(node.title);
     }
+    
+    const bookmark: ExtendedBookmark = {
+      ...node,
+      isFolder,
+      path: currentPath,
+      expanded: true, // デフォルトで展開表示
+      depth
+    };
+    
+    result.push(bookmark);
 
-    return result;
+    // 子ノードがあれば再帰的に処理
+    if (node.children && node.children.length > 0) {
+      const children = flattenBookmarks(node.children, currentPath, depth + 1);
+      result.push(...children);
+    }
+  }
+
+  return result;
+};
+
+/**
+ * ディレクトリ内のすべてのブックマークを再帰的に取得
+ * @param folder フォルダブックマーク
+ * @param allBookmarks すべてのブックマーク配列（再帰呼び出し用）
+ * @returns フォルダ内のすべてのブックマーク（サブフォルダ含む）
+ */
+export const getAllBookmarksInFolder = (
+  folder: ExtendedBookmark, 
+  allBookmarks: ExtendedBookmark[] = []
+): ExtendedBookmark[] => {
+  // すべてのブックマークから、このフォルダを親に持つものを抽出
+  const children = allBookmarks.length > 0 
+    ? allBookmarks.filter(b => b.parentId === folder.id) 
+    : folder.children || [];
+  
+  let result: ExtendedBookmark[] = [];
+  
+  for (const child of children) {
+    if (child.isFolder) {
+      // フォルダの場合は自身を追加し、再帰的に子要素も取得
+      result.push(child);
+      result = [...result, ...getAllBookmarksInFolder(child, allBookmarks)];
+    } else {
+      // ブックマークの場合はそのまま追加
+      result.push(child);
+    }
+  }
+  
+  return result;
 };
