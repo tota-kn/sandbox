@@ -96,27 +96,36 @@ import TagBadge from '../../components/TagBadge.vue';
 import { extractTags, addTagPrefix, removeTagFromTitle } from '../../utils/tagUtils';
 import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil, generateTagSuggestions } from '../../utils/bookmarkUtils';
 
-// 現在のタブ情報
+/** 現在のタブオブジェクト */
 const currentTab = ref<chrome.tabs.Tab | null>(null);
+/** 現在のタブのブックマークオブジェクト（存在する場合） */
 const currentBookmark = ref<chrome.bookmarks.BookmarkTreeNode | null>(null);
+/** ブックマークのタイトル（タグを含む） */
 const bookmarkTitle = ref('');
+/** ブックマークのURL */
 const bookmarkUrl = ref('');
+/** データ読み込み中かどうか */
 const loading = ref(true);
+/** ユーザーへのメッセージ */
 const message = ref('');
 
-// 表示中のタグ
+/** タイトルから抽出した現在表示中のタグリスト */
 const currentTags = computed(() => {
   return extractTags(bookmarkTitle.value);
 });
 
-// タグ入力関連の状態
+/** 新しく追加するタグの入力値 */
 const newTag = ref('');
+/** タグ入力時のサジェスト候補リスト */
 const tagSuggestions = ref<string[]>([]);
+/** サジェスト表示フラグ */
 const showSuggestions = ref(false);
-const isAddingTag = ref(false); // タグ追加モードかどうか
+/** タグ追加モード（入力フィールド表示）かどうか */
+const isAddingTag = ref(false);
+/** タグ入力フィールドのref */
 const tagInput = ref<HTMLInputElement | null>(null);
 
-// タグ入力に応じたサジェストを生成
+/** タグ入力に応じたサジェストを生成する */
 const filterSuggestions = async () => {
   if (!newTag.value) {
     tagSuggestions.value = [];
@@ -130,7 +139,9 @@ const filterSuggestions = async () => {
   showSuggestions.value = suggestions.length > 0;
 };
 
-// サジェストからタグを選択
+/** サジェストからタグを選択して追加する
+ * @param tag - 追加するタグ
+ */
 const selectSuggestion = (tag: string) => {
   const tagToAdd = tag;
   bookmarkTitle.value = `${bookmarkTitle.value} ${tagToAdd}`;
@@ -139,7 +150,7 @@ const selectSuggestion = (tag: string) => {
   tagSuggestions.value = [];
 };
 
-// 現在のタブ情報を取得
+/** 現在のタブ情報を取得する */
 const getCurrentTab = async () => {
   try {
     loading.value = true;
@@ -160,7 +171,7 @@ const getCurrentTab = async () => {
   }
 };
 
-// タグの追加モードを開始
+/** タグの追加モードを開始する */
 const startAddingTag = async () => {
   isAddingTag.value = true;
   newTag.value = '';
@@ -169,7 +180,7 @@ const startAddingTag = async () => {
   tagInput.value?.focus();
 };
 
-// タグを追加
+/** 新しいタグをブックマークに追加する */
 const addTag = () => {
   if (!newTag.value || newTag.value === '') {
     isAddingTag.value = false;
@@ -194,12 +205,14 @@ const addTag = () => {
   showSuggestions.value = false;
 };
 
-// タグを削除
+/** 指定したタグをブックマークから削除する
+ * @param tag - 削除するタグ
+ */
 const removeTag = (tag: string) => {
   bookmarkTitle.value = removeTagFromTitle(bookmarkTitle.value, tag);
 };
 
-// 既存のブックマークを更新
+/** 既存のブックマークを更新する */
 const updateBookmark = async () => {
   try {
     if (!currentBookmark.value || !currentBookmark.value.id) {
@@ -215,7 +228,7 @@ const updateBookmark = async () => {
   }
 };
 
-// 新しいブックマークを作成
+/** 新しいブックマークを作成する */
 const createBookmark = async () => {
   try {
     // utils/bookmarkUtils.tsの関数を使用
@@ -237,7 +250,7 @@ const createBookmark = async () => {
   }
 };
 
-// ブックマークを保存（新規作成または更新）
+/** ブックマークを保存（新規作成または更新）する */
 const saveBookmark = () => {
   if (currentBookmark.value) {
     updateBookmark();
@@ -246,7 +259,7 @@ const saveBookmark = () => {
   }
 };
 
-// ブックマークを削除
+/** ブックマークを削除する */
 const deleteBookmark = async () => {
   try {
     if (!currentBookmark.value || !currentBookmark.value.id) {
