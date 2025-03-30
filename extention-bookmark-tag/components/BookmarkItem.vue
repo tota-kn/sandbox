@@ -35,7 +35,7 @@
         </div>
         
         <!-- 表示モード -->
-        <div v-else class="group flex items-start">
+        <div v-else class="flex items-start">
           <div class="flex-1">
             <div class="flex items-center">
               <h3 class="text-base font-medium mb-1 mr-2">
@@ -43,9 +43,10 @@
               </h3>
               <button 
                 @click="startEdit" 
-                class="px-2 py-0.5 text-xs bg-gray-100 hover:bg-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                class="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+                title="編集"
               >
-                編集
+                <EditIcon />
               </button>
             </div>
             
@@ -73,6 +74,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
 import TagAddButton from './TagAddButton.vue'
+import EditIcon from './EditIcon.vue'
 import { extractTags } from '../utils/tagUtils'
 
 /**
