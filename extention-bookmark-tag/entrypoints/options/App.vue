@@ -12,17 +12,19 @@
     </div>
     
     <div class="mb-6">
-      <h2 class="text-xl font-semibold mb-3">タグ一覧</h2>
-      <div class="flex items-center gap-3 mb-3">
-        <span>検索モード：</span>
-        <label class="inline-flex items-center gap-1 cursor-pointer">
-          <input type="radio" v-model="searchMode" value="or" class="form-radio text-blue-600" />
-          <span>OR（いずれか含む）</span>
-        </label>
-        <label class="inline-flex items-center gap-1 cursor-pointer">
-          <input type="radio" v-model="searchMode" value="and" class="form-radio text-blue-600" />
-          <span>AND（すべて含む）</span>
-        </label>
+      <div class="flex items-center mb-3">
+        <h2 class="text-xl font-semibold mr-4">タグ一覧</h2>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">検索モード：</span>
+          <label class="inline-flex items-center gap-1 cursor-pointer">
+            <input type="radio" v-model="searchMode" value="or" class="form-radio text-blue-600" />
+            <span class="text-sm">OR</span>
+          </label>
+          <label class="inline-flex items-center gap-1 cursor-pointer ml-2">
+            <input type="radio" v-model="searchMode" value="and" class="form-radio text-blue-600" />
+            <span class="text-sm">AND</span>
+          </label>
+        </div>
       </div>
       <div class="flex flex-wrap gap-2">
         <TagBadge 
