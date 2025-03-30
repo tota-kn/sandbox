@@ -1,3 +1,95 @@
+<template>
+  <div class="w-80 p-4 font-sans">
+    <div v-if="loading" class="text-gray-600">
+      Loading...
+    </div>
+    
+    <div v-else>
+      <div class="mb-3 text-sm" :class="currentBookmark ? 'text-green-600' : 'text-gray-600'">
+        {{ message }}
+      </div>
+      
+      <div class="mb-4">
+        <input 
+          v-model="bookmarkTitle" 
+          type="text" 
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+        />
+      </div>
+      
+      <div class="mb-4 relative">
+        <div class="flex flex-wrap gap-2 mb-2">
+          <TagBadge 
+            v-for="tag in currentTags" 
+            :key="tag"
+            :tag="tag"
+            :selected="false"
+          >
+            <button 
+              @click.stop="removeTag(tag)" 
+              class="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+              title="Remove tag"
+            >
+              ×
+            </button>
+          </TagBadge>
+          
+          <!-- タグ追加ボタンまたは入力欄 -->
+          <div class="inline-flex items-center">
+            <input 
+              v-if="isAddingTag" 
+              v-model="newTag" 
+              type="text" 
+              placeholder="New tag" 
+              class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+              ref="tagInput"
+              @keyup.enter="addTag"
+              @input="filterSuggestions"
+              @blur="isAddingTag = false"
+            />
+            <button 
+              v-else 
+              @click="startAddingTag" 
+              class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
+              title="Add tag"
+            >+</button>
+          </div>
+          
+          <div v-if="currentTags.length === 0 && !isAddingTag" class="text-sm text-gray-500 italic">
+            No tags
+          </div>
+        </div>
+        
+        <!-- サジェスト表示エリア -->
+        <div v-if="showSuggestions" class="absolute bg-white border border-gray-300 rounded-md mt-1 w-full z-10 max-h-40 overflow-y-auto shadow-md">
+          <div v-for="suggestion in tagSuggestions" :key="suggestion" class="px-3 py-1 hover:bg-gray-100 cursor-pointer" @click="selectSuggestion(suggestion)">
+            {{ suggestion }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex gap-2">
+        <button 
+          @click="saveBookmark"
+          class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md"
+        >
+          {{ currentBookmark ? 'Update' : 'Add to Bookmarks' }}
+        </button>
+        
+        <!-- ブックマーク削除ボタン（追加済みの場合のみ表示） -->
+        <button 
+          v-if="currentBookmark"
+          @click="deleteBookmark"
+          class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md"
+          title="Delete bookmark"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script lang="ts" setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
@@ -181,95 +273,3 @@ onMounted(() => {
   getCurrentTab();
 });
 </script>
-
-<template>
-  <div class="w-80 p-4 font-sans">
-    <div v-if="loading" class="text-gray-600">
-      Loading...
-    </div>
-    
-    <div v-else>
-      <div class="mb-3 text-sm" :class="currentBookmark ? 'text-green-600' : 'text-gray-600'">
-        {{ message }}
-      </div>
-      
-      <div class="mb-4">
-        <input 
-          v-model="bookmarkTitle" 
-          type="text" 
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-        />
-      </div>
-      
-      <div class="mb-4 relative">
-        <div class="flex flex-wrap gap-2 mb-2">
-          <TagBadge 
-            v-for="tag in currentTags" 
-            :key="tag"
-            :tag="tag"
-            :selected="false"
-          >
-            <button 
-              @click.stop="removeTag(tag)" 
-              class="ml-1 text-blue-600 hover:text-blue-800 font-bold"
-              title="Remove tag"
-            >
-              ×
-            </button>
-          </TagBadge>
-          
-          <!-- タグ追加ボタンまたは入力欄 -->
-          <div class="inline-flex items-center">
-            <input 
-              v-if="isAddingTag" 
-              v-model="newTag" 
-              type="text" 
-              placeholder="New tag" 
-              class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
-              ref="tagInput"
-              @keyup.enter="addTag"
-              @input="filterSuggestions"
-              @blur="isAddingTag = false"
-            />
-            <button 
-              v-else 
-              @click="startAddingTag" 
-              class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
-              title="Add tag"
-            >+</button>
-          </div>
-          
-          <div v-if="currentTags.length === 0 && !isAddingTag" class="text-sm text-gray-500 italic">
-            No tags
-          </div>
-        </div>
-        
-        <!-- サジェスト表示エリア -->
-        <div v-if="showSuggestions" class="absolute bg-white border border-gray-300 rounded-md mt-1 w-full z-10 max-h-40 overflow-y-auto shadow-md">
-          <div v-for="suggestion in tagSuggestions" :key="suggestion" class="px-3 py-1 hover:bg-gray-100 cursor-pointer" @click="selectSuggestion(suggestion)">
-            {{ suggestion }}
-          </div>
-        </div>
-      </div>
-      
-      <div class="flex gap-2">
-        <button 
-          @click="saveBookmark"
-          class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md"
-        >
-          {{ currentBookmark ? 'Update' : 'Add to Bookmarks' }}
-        </button>
-        
-        <!-- ブックマーク削除ボタン（追加済みの場合のみ表示） -->
-        <button 
-          v-if="currentBookmark"
-          @click="deleteBookmark"
-          class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md"
-          title="Delete bookmark"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-</template>
