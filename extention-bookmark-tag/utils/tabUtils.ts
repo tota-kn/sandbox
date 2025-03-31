@@ -7,14 +7,14 @@
  * @returns {Promise<chrome.tabs.Tab | null>} 現在のタブ情報、取得できない場合はnull
  */
 export const getCurrentTab = async (): Promise<chrome.tabs.Tab | null> => {
-    try {
-        const queryOptions = { active: true, currentWindow: true };
-        const [tab] = await chrome.tabs.query(queryOptions);
-        return tab || null;
-    } catch (error) {
-        console.error('現在のタブの取得に失敗しました:', error);
-        return null;
-    }
+  try {
+    const queryOptions = { active: true, currentWindow: true };
+    const [tab] = await chrome.tabs.query(queryOptions);
+    return tab || null;
+  } catch (error) {
+    console.error('現在のタブの取得に失敗しました:', error);
+    return null;
+  }
 };
 
 /**
@@ -23,7 +23,7 @@ export const getCurrentTab = async (): Promise<chrome.tabs.Tab | null> => {
  * @returns {string} タブのURL、取得できない場合は空文字列
  */
 export const getTabUrl = (tab: chrome.tabs.Tab | null): string => {
-    return tab?.url || '';
+  return tab?.url || '';
 };
 
 /**
@@ -32,7 +32,7 @@ export const getTabUrl = (tab: chrome.tabs.Tab | null): string => {
  * @returns {string} タブのタイトル、取得できない場合は空文字列
  */
 export const getTabTitle = (tab: chrome.tabs.Tab | null): string => {
-    return tab?.title || '';
+  return tab?.title || '';
 };
 
 /**
@@ -40,18 +40,18 @@ export const getTabTitle = (tab: chrome.tabs.Tab | null): string => {
  * @returns {Promise<boolean>} ブックマーク済みならtrue
  */
 export const isCurrentTabBookmarked = async (): Promise<boolean> => {
-    try {
-        const tab = await getCurrentTab();
-        const url = getTabUrl(tab);
+  try {
+    const tab = await getCurrentTab();
+    const url = getTabUrl(tab);
 
-        if (!url) {
-            return false;
-        }
-
-        const results = await chrome.bookmarks.search({ url });
-        return results && results.length > 0;
-    } catch (error) {
-        console.error('ブックマーク状態の確認に失敗しました:', error);
-        return false;
+    if (!url) {
+      return false;
     }
+
+    const results = await chrome.bookmarks.search({ url });
+    return results && results.length > 0;
+  } catch (error) {
+    console.error('ブックマーク状態の確認に失敗しました:', error);
+    return false;
+  }
 };

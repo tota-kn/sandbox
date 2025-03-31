@@ -4,14 +4,14 @@
  * @returns 抽出されたタグの配列（@マーク付き）
  */
 export const extractTags = (title: string): string[] => {
-    if (!title) {
-        return [];
-    }
+  if (!title) {
+    return [];
+  }
 
-    const tagRegex = /@(\S+)/g;
-    const matches = title.match(tagRegex);
+  const tagRegex = /@(\S+)/g;
+  const matches = title.match(tagRegex);
 
-    return matches ? matches : [];
+  return matches ? matches : [];
 };
 
 /**
@@ -20,7 +20,7 @@ export const extractTags = (title: string): string[] => {
  * @returns @プレフィックスが削除されたテキスト
  */
 export const removeTagPrefix = (text: string): string => {
-    return text.startsWith('@') ? text.substring(1) : text;
+  return text.startsWith('@') ? text.substring(1) : text;
 };
 
 /**
@@ -29,7 +29,7 @@ export const removeTagPrefix = (text: string): string => {
  * @returns @プレフィックスが追加されたテキスト
  */
 export const addTagPrefix = (text: string): string => {
-    return text.startsWith('@') ? text : `@${text}`;
+  return text.startsWith('@') ? text : `@${text}`;
 };
 
 /**
@@ -39,8 +39,8 @@ export const addTagPrefix = (text: string): string => {
  * @returns マージされたユニークなタグの配列
  */
 export const mergeTags = (existingTags: string[], newTags: string[]): string[] => {
-    const uniqueTags = new Set([...existingTags, ...newTags]);
-    return Array.from(uniqueTags);
+  const uniqueTags = new Set([...existingTags, ...newTags]);
+  return Array.from(uniqueTags);
 };
 
 /**
@@ -49,7 +49,7 @@ export const mergeTags = (existingTags: string[], newTags: string[]): string[] =
  * @returns スペース区切りでタグを結合した文字列
  */
 export const tagsToString = (tags: string[]): string => {
-    return tags.join(' ');
+  return tags.join(' ');
 };
 
 /**
@@ -59,5 +59,5 @@ export const tagsToString = (tags: string[]): string => {
  * @returns タグが削除されたタイトル
  */
 export const removeTagFromTitle = (title: string, tagToRemove: string): string => {
-    return title.replace(tagToRemove, '').replace(/\s+/g, ' ').trim();
+  return title.replace(tagToRemove, '').replace(/\s+/g, ' ').trim();
 };
