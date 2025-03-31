@@ -8,6 +8,7 @@ import stylistic from '@stylistic/eslint-plugin'
 import { includeIgnoreFile } from "@eslint/compat";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import unusedImports from "eslint-plugin-unused-imports";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,15 @@ export default  tseslint.config(
     },
     rules: {
       '@stylistic/indent': ['error', 2],
+    },
+  },
+  {
+    plugins: { 
+      "unused-imports": unusedImports
+    },
+    rules: {
+      "unused-imports/no-unused-vars": "error",
+      "unused-imports/no-unused-imports": "error",
     },
   }
 )

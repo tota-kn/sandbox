@@ -124,12 +124,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
-import TagAddButton from '../../components/TagAddButton.vue'
-import BookmarkItem from '../../components/BookmarkItem.vue'
 import SearchBox from '../../components/SearchBox.vue'
 import FolderView from '../../components/FolderView.vue'
 import BatchEditForm from '../../components/BatchEditForm.vue'
-import { extractTags, addTagPrefix } from '../../utils/tagUtils'
+import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
 /** ブックマークの配列を管理する状態 */

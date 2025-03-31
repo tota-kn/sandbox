@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from 'vue';
+import { ref, nextTick, watch } from 'vue';
 import { generateTagSuggestions } from '../utils/bookmarkUtils';
 import { addTagPrefix } from '../utils/tagUtils';
 
@@ -90,9 +90,6 @@ const showSuggestions = ref(false);
 const tagSuggestions = ref<string[]>([]);
 /** サジェスト選択中のフラグ */
 const isSelectingSuggestion = ref(false);
-
-/** サジェストリストの位置スタイル */
-const suggestionsPositionStyle = computed(() => props.suggestionsPosition);
 
 /** タグ入力モードを開始する */
 const startAddingTag = async (): Promise<void> => {

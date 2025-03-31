@@ -93,11 +93,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
 import TagAddButton from './TagAddButton.vue'
 import EditIcon from './EditIcon.vue'
-import { extractTags, addTagPrefix, removeTagFromTitle } from '../utils/tagUtils'
+import { extractTags, removeTagFromTitle } from '../utils/tagUtils'
 
 /**
  * ブックマークアイテムのプロパティ定義

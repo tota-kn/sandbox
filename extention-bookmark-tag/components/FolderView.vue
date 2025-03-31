@@ -128,7 +128,7 @@ import { ExtendedBookmark, getAllBookmarksInFolder } from '../utils/bookmarkUtil
 /**
  * フォルダビューコンポーネントのプロパティ定義
  */
-const props = defineProps<{
+defineProps<{
   /** 表示するブックマーク配列 */
   bookmarks: ExtendedBookmark[]
 }>()

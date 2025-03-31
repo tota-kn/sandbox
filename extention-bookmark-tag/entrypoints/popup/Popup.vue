@@ -105,7 +105,7 @@
 import { ref, computed, onMounted } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
 import TagAddButton from '../../components/TagAddButton.vue';
-import { extractTags, addTagPrefix, removeTagFromTitle } from '../../utils/tagUtils';
+import { extractTags, removeTagFromTitle } from '../../utils/tagUtils';
 import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil } from '../../utils/bookmarkUtils';
 
 /** 現在のタブオブジェクト */
