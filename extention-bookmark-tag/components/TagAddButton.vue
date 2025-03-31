@@ -2,21 +2,23 @@
   <div class="inline-flex items-center relative">
     <input 
       v-if="isAddingTag" 
+      ref="tagInput" 
       v-model="newTagInput" 
       type="text" 
       :placeholder="placeholder" 
-      class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500" 
-      ref="tagInput"
+      class="border border-gray-300 rounded-full text-xs p-1 px-2 w-24 focus:outline-none focus:ring-1 focus:ring-blue-500"
       @keyup.enter.prevent="addTag"
       @input="filterSuggestions"
       @blur="handleBlur"
-    />
+    >
     <button 
       v-else 
-      @click="startAddingTag" 
-      class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs"
+      class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-xs" 
       :title="buttonTitle"
-    >+</button>
+      @click="startAddingTag"
+    >
+      +
+    </button>
     
     <!-- サジェスト表示エリア -->
     <div 

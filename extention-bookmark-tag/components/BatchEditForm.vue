@@ -1,6 +1,8 @@
 <template>
   <div class="mb-4 p-4 bg-blue-50 rounded-md border border-blue-200">
-    <h3 class="font-medium mb-2 text-blue-800">Batch Tag Edit</h3>
+    <h3 class="font-medium mb-2 text-blue-800">
+      Batch Tag Edit
+    </h3>
     
     <div class="flex flex-col gap-3">
       <!-- タグ追加 -->
@@ -9,11 +11,11 @@
           v-model="tagToAdd" 
           placeholder="Tag to add..." 
           class="px-3 py-2 border rounded flex-grow"
-        />
+        >
         <button 
-          @click="addTag"
           :disabled="!tagToAdd || selectedCount === 0"
           class="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+          @click="addTag"
         >
           Add Tag
         </button>
@@ -25,11 +27,11 @@
           v-model="tagToRemove" 
           placeholder="Tag to remove..." 
           class="px-3 py-2 border rounded flex-grow"
-        />
+        >
         <button 
-          @click="removeTag"
           :disabled="!tagToRemove || selectedCount === 0"
           class="px-4 py-2 bg-red-600 text-white rounded disabled:opacity-50"
+          @click="removeTag"
         >
           Remove Tag
         </button>

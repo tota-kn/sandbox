@@ -11,24 +11,24 @@
     <input
       v-if="isEditing && showEditButton"
       ref="inputRef"
-      type="text"
       v-model="editingValue"
+      type="text"
       class="bg-transparent focus:outline-none w-full text-xs"
       @keydown.enter="saveEdit"
       @keydown.esc="cancelEdit"
       @blur="cancelEdit"
       @click.stop
-    />
+    >
     <span v-else>{{ displayTag }}</span>
     <button 
       v-if="showEditButton && !isEditing" 
       class="ml-1 text-gray-500 hover:text-gray-700" 
-      @click.stop="startEditing"
       title="Edit tag"
+      @click.stop="startEditing"
     >
       <EditIcon size="small" />
     </button>
-    <slot></slot>
+    <slot />
   </div>
 </template>
 

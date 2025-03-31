@@ -1,13 +1,19 @@
 <template>
   <ul class="list-none p-0">
-    <template v-for="bookmark in bookmarks" :key="bookmark.id">
+    <template
+      v-for="bookmark in bookmarks"
+      :key="bookmark.id"
+    >
       <!-- ルートフォルダのみここで表示（重複表示を防ぐ） -->
-      <li v-if="bookmark.isFolder && (!bookmark.parentId || bookmark.parentId === '0' || bookmark.parentId === '1') && 
-              !bookmarks.some(b => b.id === bookmark.parentId && b.isFolder)" class="mb-1">
+      <li
+        v-if="bookmark.isFolder && (!bookmark.parentId || bookmark.parentId === '0' || bookmark.parentId === '1') && 
+          !bookmarks.some(b => b.id === bookmark.parentId && b.isFolder)"
+        class="mb-1"
+      >
         <div class="flex items-center py-2 px-1 hover:bg-gray-50 rounded">
           <button 
-            @click="toggleFolderExpanded(bookmark)" 
-            class="mr-2 w-4 h-4 flex items-center justify-center"
+            class="mr-2 w-4 h-4 flex items-center justify-center" 
+            @click="toggleFolderExpanded(bookmark)"
           >
             <span v-if="bookmark.expanded">▼</span>
             <span v-else>▶</span>
@@ -18,13 +24,13 @@
             <input 
               type="checkbox" 
               :checked="getAllBookmarksInFolder(bookmark, bookmarks).some(b => b.selected && !b.isFolder)"
-              @change="toggleFolderSelection(bookmark)"
               :indeterminate.prop="
                 getAllBookmarksInFolder(bookmark, bookmarks).some(b => b.selected && !b.isFolder) && 
-                !getAllBookmarksInFolder(bookmark, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
+                  !getAllBookmarksInFolder(bookmark, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
               "
               class="h-4 w-4 text-blue-600"
-            />
+              @change="toggleFolderSelection(bookmark)"
+            >
           </div>
           
           <span class="font-medium">
@@ -36,15 +42,24 @@
         </div>
         
         <!-- フォルダ内のブックマーク -->
-        <div v-if="bookmark.expanded" class="pl-6">
+        <div
+          v-if="bookmark.expanded"
+          class="pl-6"
+        >
           <ul class="list-none p-0">
-            <template v-for="child in bookmarks.filter(b => b.parentId === bookmark.id)" :key="child.id">
+            <template
+              v-for="child in bookmarks.filter(b => b.parentId === bookmark.id)"
+              :key="child.id"
+            >
               <!-- サブフォルダの場合 -->
-              <li v-if="child.isFolder" class="mb-1">
+              <li
+                v-if="child.isFolder"
+                class="mb-1"
+              >
                 <div class="flex items-center py-2 px-1 hover:bg-gray-50 rounded">
                   <button 
-                    @click="toggleFolderExpanded(child)" 
-                    class="mr-2 w-4 h-4 flex items-center justify-center"
+                    class="mr-2 w-4 h-4 flex items-center justify-center" 
+                    @click="toggleFolderExpanded(child)"
                   >
                     <span v-if="child.expanded">▼</span>
                     <span v-else>▶</span>
@@ -55,13 +70,13 @@
                     <input 
                       type="checkbox" 
                       :checked="getAllBookmarksInFolder(child, bookmarks).some(b => b.selected && !b.isFolder)"
-                      @change="toggleFolderSelection(child)"
                       :indeterminate.prop="
                         getAllBookmarksInFolder(child, bookmarks).some(b => b.selected && !b.isFolder) && 
-                        !getAllBookmarksInFolder(child, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
+                          !getAllBookmarksInFolder(child, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
                       "
                       class="h-4 w-4 text-blue-600"
-                    />
+                      @change="toggleFolderSelection(child)"
+                    >
                   </div>
                   
                   <span class="font-medium">
@@ -73,7 +88,10 @@
                 </div>
                 
                 <!-- サブフォルダ内のアイテム（再帰的に表示） -->
-                <div v-if="child.expanded" class="pl-6">
+                <div
+                  v-if="child.expanded"
+                  class="pl-6"
+                >
                   <BookmarkItem 
                     v-for="grandchild in bookmarks.filter(b => b.parentId === child.id && !b.isFolder)"
                     :key="grandchild.id"

@@ -2,22 +2,39 @@
   <div class="w-80 p-4 font-sans">
     <!-- ヘッダー部分を追加して右上にオプションリンクを配置 -->
     <div class="flex justify-between items-center mb-3">
-      <div class="text-sm" :class="currentBookmark ? 'text-green-600' : 'text-gray-600'">
+      <div
+        class="text-sm"
+        :class="currentBookmark ? 'text-green-600' : 'text-gray-600'"
+      >
         {{ message }}
       </div>
       <button 
-        @click="openOptionsPage" 
-        class="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
+        class="p-1.5 rounded-full hover:bg-gray-200 transition-colors" 
         title="Settings"
+        @click="openOptionsPage"
       >
         <!-- 本のアイコン -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-gray-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+          />
         </svg>
       </button>
     </div>
     
-    <div v-if="loading" class="text-gray-600">
+    <div
+      v-if="loading"
+      class="text-gray-600"
+    >
       Loading...
     </div>
     
@@ -27,7 +44,7 @@
           v-model="bookmarkTitle" 
           type="text" 
           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-        />
+        >
       </div>
       
       <div class="mb-4 relative">
@@ -39,9 +56,9 @@
             :selected="false"
           >
             <button 
-              @click.stop="removeTag(tag)" 
-              class="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+              class="ml-1 text-blue-600 hover:text-blue-800 font-bold" 
               title="Remove tag"
+              @click.stop="removeTag(tag)"
             >
               ×
             </button>
@@ -53,7 +70,10 @@
             @add-tag="addTag"
           />
           
-          <div v-if="currentTags.length === 0" class="text-sm text-gray-500 italic">
+          <div
+            v-if="currentTags.length === 0"
+            class="text-sm text-gray-500 italic"
+          >
             No tags
           </div>
         </div>
@@ -61,8 +81,8 @@
       
       <div class="flex gap-2">
         <button 
-          @click="saveBookmark"
           class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md"
+          @click="saveBookmark"
         >
           {{ currentBookmark ? 'Update' : 'Add to Bookmarks' }}
         </button>
@@ -70,9 +90,9 @@
         <!-- ブックマーク削除ボタン（追加済みの場合のみ表示） -->
         <button 
           v-if="currentBookmark"
-          @click="deleteBookmark"
           class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md"
           title="Delete bookmark"
+          @click="deleteBookmark"
         >
           Delete
         </button>

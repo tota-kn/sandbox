@@ -1,18 +1,32 @@
 <template>
   <div class="max-w-3xl mx-auto p-5 font-sans">
-    <h1 class="text-2xl font-bold text-gray-800 pb-3 mb-4 border-b-2 border-gray-100">Bookmark Tag Manager</h1>
+    <h1 class="text-2xl font-bold text-gray-800 pb-3 mb-4 border-b-2 border-gray-100">
+      Bookmark Tag Manager
+    </h1>
     
     <div class="mb-6">
       <div class="flex items-center mb-3">
-        <h2 class="text-xl font-semibold mr-4">Tag List</h2>
+        <h2 class="text-xl font-semibold mr-4">
+          Tag List
+        </h2>
         <div class="flex items-center gap-2">
           <span class="text-sm text-gray-600">Filter:</span>
           <label class="inline-flex items-center gap-1 cursor-pointer">
-            <input type="radio" v-model="searchMode" value="or" class="form-radio text-blue-600" />
+            <input
+              v-model="searchMode"
+              type="radio"
+              value="or"
+              class="form-radio text-blue-600"
+            >
             <span class="text-sm">OR</span>
           </label>
           <label class="inline-flex items-center gap-1 cursor-pointer ml-2">
-            <input type="radio" v-model="searchMode" value="and" class="form-radio text-blue-600" />
+            <input
+              v-model="searchMode"
+              type="radio"
+              value="and"
+              class="form-radio text-blue-600"
+            >
             <span class="text-sm">AND</span>
           </label>
         </div>
@@ -42,22 +56,24 @@
     
     <div class="mt-8">
       <div class="flex justify-between items-center mb-3">
-        <h2 class="text-xl font-semibold">Bookmark List</h2>
+        <h2 class="text-xl font-semibold">
+          Bookmark List
+        </h2>
         
         <!-- バッチ編集モードボタン -->
         <div class="flex items-center gap-2">
           <span class="text-xs text-gray-500">{{ selectedBookmarks.length }} selected</span>
           <button 
-            @click="toggleBatchEditMode" 
-            class="px-3 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
+            class="px-3 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white" 
             :class="{'bg-red-500 hover:bg-red-600': batchEditMode}"
+            @click="toggleBatchEditMode"
           >
             {{ batchEditMode ? 'Cancel Batch Edit' : 'Batch Edit Tags' }}
           </button>
           <button 
             v-if="selectedBookmarks.length > 0"
-            @click="clearAllSelection" 
-            class="px-3 py-1 text-sm rounded bg-gray-300 hover:bg-gray-400"
+            class="px-3 py-1 text-sm rounded bg-gray-300 hover:bg-gray-400" 
+            @click="clearAllSelection"
           >
             Clear Selection
           </button>
@@ -80,8 +96,16 @@
         />
       </div>
 
-      <div v-if="loading" class="py-4">Loading...</div>
-      <div v-else-if="filteredBookmarks.length === 0" class="py-5 text-gray-500 italic">
+      <div
+        v-if="loading"
+        class="py-4"
+      >
+        Loading...
+      </div>
+      <div
+        v-else-if="filteredBookmarks.length === 0"
+        class="py-5 text-gray-500 italic"
+      >
         No bookmarks to display
       </div>
       

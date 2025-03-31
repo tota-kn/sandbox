@@ -2,40 +2,49 @@
   <li class="border-b last:border-b-0 py-3">
     <div class="flex items-start">
       <!-- 選択チェックボックス -->
-      <div v-if="selectable" class="mr-3 mt-1">
+      <div
+        v-if="selectable"
+        class="mr-3 mt-1"
+      >
         <input 
           type="checkbox" 
           :checked="selected" 
-          @change="$emit('toggle-select')"
           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-        />
+          @change="$emit('toggle-select')"
+        >
       </div>
       
       <div class="flex-1 min-w-0">
         <!-- 編集モード -->
-        <div v-if="isEditing" class="flex items-center gap-2 mb-1">
+        <div
+          v-if="isEditing"
+          class="flex items-center gap-2 mb-1"
+        >
           <input 
-            v-model="editTitle" 
+            ref="titleInput" 
+            v-model="editTitle"
             class="flex-1 px-2 py-1 border rounded text-sm"
             @keyup.enter="saveEdit"
-            ref="titleInput"
-          />
+          >
           <button 
-            @click="saveEdit" 
-            class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
+            class="px-2 py-1 text-xs bg-blue-500 text-white rounded" 
+            @click="saveEdit"
           >
             保存
           </button>
           <button 
-            @click="cancelEdit" 
-            class="px-2 py-1 text-xs bg-gray-300 rounded"
+            class="px-2 py-1 text-xs bg-gray-300 rounded" 
+            @click="cancelEdit"
           >
             キャンセル
           </button>
         </div>
         
         <!-- 表示モード -->
-        <div v-else class="flex items-start">
+        <div
+          v-else
+          class="flex items-start"
+        >
           <div class="flex-1">
             <div class="flex justify-between items-center">
               <!-- タイトルとタグを左に配置 -->
@@ -53,9 +62,9 @@
                     size="small"
                   >
                     <button 
-                      @click.stop="removeTag(tag)" 
-                      class="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                      class="ml-1 text-blue-600 hover:text-blue-800 font-bold" 
                       title="Remove tag"
+                      @click.stop="removeTag(tag)"
                     >
                       ×
                     </button>
@@ -69,9 +78,9 @@
 
               <!-- 編集ボタンを右に配置 -->
               <button 
-                @click="startEdit" 
-                class="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 ml-2 shrink-0"
+                class="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 ml-2 shrink-0" 
                 title="編集"
+                @click="startEdit"
               >
                 <EditIcon />
               </button>

@@ -15,11 +15,22 @@ const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 export default  tseslint.config(
   includeIgnoreFile(gitignorePath),
-
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
-  ...eslintPluginVue.configs['flat/recommended'],
-
+  {
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.recommended,
+      ...eslintPluginVue.configs['flat/recommended'],
+    ],
+    files: ['**/*.{js,ts,vue}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: globals.browser,
+      parserOptions: {
+        parser: tseslint.parser,
+      },
+    },
+  },
   {
     plugins: {
       '@stylistic': stylistic
@@ -27,14 +38,5 @@ export default  tseslint.config(
     rules: {
       '@stylistic/indent': ['error', 2],
     },
-  },
-  {
-    languageOptions: {
-      sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node
-      }
-    }
   }
 )
