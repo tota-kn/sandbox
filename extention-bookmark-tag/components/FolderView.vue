@@ -33,8 +33,9 @@
             >
           </div>
           
-          <span class="font-medium">
-            📁 {{ bookmark.title }}
+          <span class="font-medium flex items-center space-x-2">
+            <FolderIcon class="size-4 text-grey-500" />            
+            <span>{{ bookmark.title }}</span>
           </span>
           <span class="ml-2 text-xs text-gray-500">
             ({{ getAllBookmarksInFolder(bookmark, bookmarks).filter(b => !b.isFolder).length }})
@@ -79,8 +80,9 @@
                     >
                   </div>
                   
-                  <span class="font-medium">
-                    📁 {{ child.title }}
+                  <span class="font-medium flex items-center space-x-2">
+                    <FolderIcon class="size-4 text-grey-500" />
+                    <span>{{ child.title }}</span>
                   </span>
                   <span class="ml-2 text-xs text-gray-500">
                     ({{ getAllBookmarksInFolder(child, bookmarks).filter(b => !b.isFolder).length }})
@@ -124,6 +126,7 @@
 <script setup lang="ts">
 import BookmarkItem from './BookmarkItem.vue'
 import { ExtendedBookmark, getAllBookmarksInFolder } from '../utils/bookmarkUtils'
+import { FolderIcon } from '@heroicons/vue/24/outline'
 
 /**
  * フォルダビューコンポーネントのプロパティ定義
