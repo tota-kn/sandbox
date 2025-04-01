@@ -91,8 +91,6 @@ const bookmarkSearchQuery = ref('')
 const tagSearchQuery = ref('')
 /** 選択されているタグのリスト */
 const selectedTags = ref<string[]>([])
-/** 選択されているブックマーク一覧 */
-const selectedBookmarks = computed(() => bookmarks.value.filter(b => b.selected))
 
 /**
  * Chrome拡張のAPIを使用してブックマークを取得する
