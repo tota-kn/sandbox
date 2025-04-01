@@ -9,27 +9,6 @@
         <h2 class="text-xl font-semibold mr-4">
           Tag List
         </h2>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">Filter:</span>
-          <label class="inline-flex items-center gap-1 cursor-pointer">
-            <input
-              v-model="searchMode"
-              type="radio"
-              value="or"
-              class="form-radio text-primary"
-            >
-            <span class="text-sm">OR</span>
-          </label>
-          <label class="inline-flex items-center gap-1 cursor-pointer ml-2">
-            <input
-              v-model="searchMode"
-              type="radio"
-              value="and"
-              class="form-radio text-primary"
-            >
-            <span class="text-sm">AND</span>
-          </label>
-        </div>
       </div>
 
       <!-- タグ検索ボックス -->
@@ -112,8 +91,6 @@ const bookmarkSearchQuery = ref('')
 const tagSearchQuery = ref('')
 /** 選択されているタグのリスト */
 const selectedTags = ref<string[]>([])
-/** タグ検索のモード（AND検索かOR検索か） */
-const searchMode = ref<'and' | 'or'>('or')
 /** 選択されているブックマーク一覧 */
 const selectedBookmarks = computed(() => bookmarks.value.filter(b => b.selected))
 
@@ -263,21 +240,15 @@ const filteredBookmarks = computed(() => {
     })
   }
   
-  // タグでフィルタリング
+  // タグでフィルタリング (常にOR検索)
   if (selectedTags.value.length > 0) {
     filtered = filtered.filter(bookmark => {
       // フォルダはそのまま表示
       if (bookmark.isFolder) return true
       
       const bookmarkTags = extractTags(bookmark.title || '')
-      
-      if (searchMode.value === 'or') {
-        // OR検索: 選択したタグのうち少なくとも1つが含まれている
-        return selectedTags.value.some(tag => bookmarkTags.includes(tag))
-      } else {
-        // AND検索: 選択したタグすべてが含まれている
-        return selectedTags.value.every(tag => bookmarkTags.includes(tag))
-      }
+      // 選択したタグのうち少なくとも1つが含まれているものをフィルタリング
+      return selectedTags.value.some(tag => bookmarkTags.includes(tag))
     })
   }
   
