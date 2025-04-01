@@ -59,27 +59,7 @@
         <h2 class="text-xl font-semibold">
           Bookmark List
         </h2>
-        
-        <!-- バッチ編集モードボタン -->
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">{{ selectedBookmarks.length }} selected</span>
-          <button
-            v-if="selectedBookmarks.length > 0"
-            class="ml-auto px-4 py-2 bg-primary hover:bg-primary-hover text-primary-foreground rounded-md"
-            @click="batchEditMode = !batchEditMode"
-          >
-            {{ batchEditMode ? 'Cancel' : 'Batch Edit Tags' }}
-          </button>
-        </div>
       </div>
-
-      <!-- バッチ編集フォーム -->
-      <BatchEditForm 
-        v-if="batchEditMode"
-        :selected-count="selectedBookmarks.length"
-        @add-tag="addTagToBatch"
-        @remove-tag="removeTagFromBatch"
-      />
 
       <!-- ブックマーク検索ボックス -->
       <div class="mb-3">
@@ -119,7 +99,6 @@ import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
 import SearchBox from '../../components/SearchBox.vue'
 import FolderView from '../../components/FolderView.vue'
-import BatchEditForm from '../../components/BatchEditForm.vue'
 import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
@@ -137,12 +116,6 @@ const selectedTags = ref<string[]>([])
 const searchMode = ref<'and' | 'or'>('or')
 /** 選択されているブックマーク一覧 */
 const selectedBookmarks = computed(() => bookmarks.value.filter(b => b.selected))
-/** バッチ編集モードかどうかのフラグ */
-const batchEditMode = ref(false)
-/** バッチ編集で追加するタグ */
-const batchTagToAdd = ref('')
-/** バッチ編集で削除するタグ */
-const batchTagToRemove = ref('')
 
 /**
  * Chrome拡張のAPIを使用してブックマークを取得する
@@ -349,59 +322,5 @@ onMounted(() => {
  */
 const toggleBookmarkSelection = (bookmark: ExtendedBookmark): void => {
   bookmark.selected = !bookmark.selected
-}
-
-/**
- * 選択されたブックマークに一括でタグを追加
- * @param {string} tagInput 追加するタグ
- * @returns {Promise<void>}
- */
-const addTagToBatch = async (tagInput: string): Promise<void> => {
-  if (!tagInput || selectedBookmarks.value.length === 0) return
-
-  try {
-    loading.value = true
-    const tag = tagInput.startsWith('@') ? tagInput : `@${tagInput}`
-
-    for (const bookmark of selectedBookmarks.value) {
-      if (!bookmark.isFolder && !extractTags(bookmark.title || '').includes(tag.substring(1))) {
-        const updatedTitle = `${bookmark.title} ${tag}`
-        await updateBookmarkUtil(bookmark.id, updatedTitle)
-        bookmark.title = updatedTitle
-      }
-    }
-
-    loading.value = false
-  } catch (error) {
-    console.error('タグの一括追加に失敗しました:', error)
-    loading.value = false
-  }
-}
-
-/**
- * 選択されたブックマークから一括でタグを削除
- * @param {string} tagInput 削除するタグ
- * @returns {Promise<void>}
- */
-const removeTagFromBatch = async (tagInput: string): Promise<void> => {
-  if (!tagInput || selectedBookmarks.value.length === 0) return
-
-  try {
-    loading.value = true
-    const tag = tagInput.startsWith('@') ? tagInput : `@${tagInput}`
-
-    for (const bookmark of selectedBookmarks.value) {
-      if (!bookmark.isFolder && extractTags(bookmark.title || '').includes(tag.substring(1))) {
-        const updatedTitle = (bookmark.title || '').replace(tag, '').replace(/\s+/g, ' ').trim()
-        await updateBookmarkUtil(bookmark.id, updatedTitle)
-        bookmark.title = updatedTitle
-      }
-    }
-
-    loading.value = false
-  } catch (error) {
-    console.error('タグの一括削除に失敗しました:', error)
-    loading.value = false
-  }
 }
 </script>
