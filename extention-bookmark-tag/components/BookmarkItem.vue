@@ -82,7 +82,7 @@
                 title="編集"
                 @click="startEdit"
               >
-                <EditIcon />
+                <PencilSquareIcon class="size-4" />
               </button>
             </div>
           </div>
@@ -96,8 +96,8 @@
 import { ref, computed, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
 import TagAddButton from './TagAddButton.vue'
-import EditIcon from './EditIcon.vue'
 import { extractTags, removeTagFromTitle } from '../utils/tagUtils'
+import { PencilSquareIcon} from '@heroicons/vue/24/outline'
 
 /**
  * ブックマークアイテムのプロパティ定義

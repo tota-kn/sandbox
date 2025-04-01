@@ -26,7 +26,7 @@
       title="Edit tag"
       @click.stop="startEditing"
     >
-      <EditIcon size="small" />
+      <PencilSquareIcon class="size-4" />
     </button>
     <slot />
   </div>
@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { computed, ref, nextTick } from 'vue'
 import { removeTagPrefix, addTagPrefix } from '../utils/tagUtils'
-import EditIcon from './EditIcon.vue'
+import { PencilSquareIcon} from '@heroicons/vue/24/outline'
 
 /** 
  * コンポーネントのプロパティ定義
