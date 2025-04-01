@@ -1,17 +1,15 @@
 <template>
   <div class="max-w-3xl mx-auto p-5 font-sans">
-    <PageHeader>Bookmark Tag Manager</PageHeader>
-    
+    <PageHeader>Bookmark Tag Manager</PageHeader>  
     <div class="mb-6">
       <SectionHeader>Tag List</SectionHeader>
 
       <!-- タグ検索ボックス -->
-      <div class="mb-3">
-        <SearchBox 
-          v-model="tagSearchQuery" 
-          placeholder="Search tags..."
-        />
-      </div>
+      <SearchBox 
+        v-model="tagSearchQuery"
+        class="mb-3" 
+        placeholder="Search tags..."
+      />
 
       <!-- タグ一覧 -->
       <div class="flex flex-wrap gap-2">
