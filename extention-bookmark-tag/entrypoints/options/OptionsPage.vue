@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-3xl mx-auto p-5 font-sans">
+  <div class="max-w-3xl mx-auto p-5 space-y-4">
     <PageHeader>Bookmark Tag Manager</PageHeader>  
 
-    <div class="mb-6">
+    <div>
       <SectionHeader>Tag List</SectionHeader>
 
       <SearchBox 
@@ -24,7 +24,7 @@
       </div>
     </div>
     
-    <div class="mt-8">
+    <div>
       <SectionHeader>Bookmark List</SectionHeader>
 
       <SearchBox 
