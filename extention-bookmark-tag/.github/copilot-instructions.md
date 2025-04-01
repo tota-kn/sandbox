@@ -119,3 +119,7 @@ const emit = defineEmits<{
   change: [id: number]
 }>()
 ```
+
+### スタイリング
+- tailwindのCSSクラスを利用してください。styleタグとinline styleは使わないでください。
+- クラス指定はなるべく/assets/css/tailwind.cssの定義にある変数を利用してください
