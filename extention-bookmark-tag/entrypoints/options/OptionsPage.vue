@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-3xl mx-auto p-5 space-y-4">
+  <div class="max-w-3xl mx-auto p-5 space-y-4 font-sans">
     <PageHeader>Bookmark Tag Manager</PageHeader>  
 
     <div>
