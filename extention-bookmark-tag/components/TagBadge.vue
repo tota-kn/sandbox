@@ -3,8 +3,8 @@
     :class="[
       'px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1',
       selected 
-        ? 'bg-blue-100 text-blue-800 border border-blue-300'
-        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
+        ? 'bg-tag-selected-bg text-tag-selected-text border border-tag-selected-border'
+        : 'bg-tag-default-bg text-tag-default-text border border-tag-default-border hover:bg-gray-200'
     ]"
     @click="$emit('toggle')"
   >
@@ -22,7 +22,7 @@
     <span v-else>{{ displayTag }}</span>
     <button 
       v-if="showEditButton && !isEditing" 
-      class="ml-1 text-gray-500 hover:text-gray-700" 
+      class="ml-1 text-muted hover:text-gray-700" 
       title="Edit tag"
       @click.stop="startEditing"
     >

@@ -9,7 +9,7 @@
         <input 
           type="checkbox" 
           :checked="selected" 
-          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          class="h-4 w-4 text-primary focus:ring-primary-hover border-border rounded"
           @change="$emit('toggle-select')"
         >
       </div>
@@ -27,13 +27,13 @@
             @keyup.enter="saveEdit"
           >
           <button 
-            class="px-2 py-1 text-xs bg-blue-500 text-white rounded" 
+            class="px-2 py-1 text-xs bg-primary text-primary-foreground rounded" 
             @click="saveEdit"
           >
             保存
           </button>
           <button 
-            class="px-2 py-1 text-xs bg-gray-300 rounded" 
+            class="px-2 py-1 text-xs bg-secondary hover:bg-secondary-hover rounded" 
             @click="cancelEdit"
           >
             キャンセル
@@ -62,7 +62,7 @@
                     size="small"
                   >
                     <button 
-                      class="ml-1 text-blue-600 hover:text-blue-800 font-bold" 
+                      class="ml-1 text-primary hover:text-primary-hover font-bold" 
                       title="Remove tag"
                       @click.stop="removeTag(tag)"
                     >
@@ -78,7 +78,7 @@
 
               <!-- 編集ボタンを右に配置 -->
               <button 
-                class="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 ml-2 shrink-0" 
+                class="p-1 text-muted hover:text-foreground rounded-full hover:bg-secondary ml-2 shrink-0" 
                 title="編集"
                 @click="startEdit"
               >

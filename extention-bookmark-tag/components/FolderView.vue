@@ -28,16 +28,16 @@
                 getAllBookmarksInFolder(bookmark, bookmarks).some(b => b.selected && !b.isFolder) && 
                   !getAllBookmarksInFolder(bookmark, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
               "
-              class="h-4 w-4 text-blue-600"
+              class="h-4 w-4 text-primary"
               @change="toggleFolderSelection(bookmark)"
             >
           </div>
           
           <span class="font-medium flex items-center space-x-2">
-            <FolderIcon class="size-4 text-grey-500" />            
+            <FolderIcon class="size-4 text-muted" />            
             <span>{{ bookmark.title }}</span>
           </span>
-          <span class="ml-2 text-xs text-gray-500">
+          <span class="ml-2 text-xs text-muted">
             ({{ getAllBookmarksInFolder(bookmark, bookmarks).filter(b => !b.isFolder).length }})
           </span>
         </div>
@@ -75,16 +75,16 @@
                         getAllBookmarksInFolder(child, bookmarks).some(b => b.selected && !b.isFolder) && 
                           !getAllBookmarksInFolder(child, bookmarks).filter(b => !b.isFolder).every(b => b.selected)
                       "
-                      class="h-4 w-4 text-blue-600"
+                      class="h-4 w-4 text-primary"
                       @change="toggleFolderSelection(child)"
                     >
                   </div>
                   
                   <span class="font-medium flex items-center space-x-2">
-                    <FolderIcon class="size-4 text-grey-500" />
+                    <FolderIcon class="size-4 text-muted" />
                     <span>{{ child.title }}</span>
                   </span>
-                  <span class="ml-2 text-xs text-gray-500">
+                  <span class="ml-2 text-xs text-muted">
                     ({{ getAllBookmarksInFolder(child, bookmarks).filter(b => !b.isFolder).length }})
                   </span>
                 </div>

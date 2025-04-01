@@ -8,14 +8,14 @@
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     >
     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-      <MagnifyingGlassIcon class="size-4  text-gray-400" />
+      <MagnifyingGlassIcon class="size-4 text-muted" />
     </div>
     <button 
       v-if="modelValue"
       class="absolute inset-y-0 right-0 pr-3 flex items-center" 
       @click="$emit('update:modelValue', '')"
     >
-      <XMarkIcon class="size-4 text-gray-400 hover:text-gray-600" />
+      <XMarkIcon class="size-4 text-muted hover:text-foreground" />
     </button>
   </div>
 </template>

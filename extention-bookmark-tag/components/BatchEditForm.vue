@@ -1,6 +1,6 @@
 <template>
-  <div class="mb-4 p-4 bg-blue-50 rounded-md border border-blue-200">
-    <h3 class="font-medium mb-2 text-blue-800">
+  <div class="mb-4 p-4 bg-accent rounded-md border border-blue-200">
+    <h3 class="font-medium mb-2 text-tag-selected-text">
       Batch Tag Edit
     </h3>
     
@@ -14,7 +14,7 @@
         >
         <button 
           :disabled="!tagToAdd || selectedCount === 0"
-          class="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded disabled:opacity-50"
           @click="addTag"
         >
           Add Tag
@@ -30,7 +30,7 @@
         >
         <button 
           :disabled="!tagToRemove || selectedCount === 0"
-          class="px-4 py-2 bg-red-600 text-white rounded disabled:opacity-50"
+          class="px-4 py-2 bg-destructive text-destructive-foreground rounded disabled:opacity-50"
           @click="removeTag"
         >
           Remove Tag

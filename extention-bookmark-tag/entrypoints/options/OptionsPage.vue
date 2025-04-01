@@ -16,7 +16,7 @@
               v-model="searchMode"
               type="radio"
               value="or"
-              class="form-radio text-blue-600"
+              class="form-radio text-primary"
             >
             <span class="text-sm">OR</span>
           </label>
@@ -25,7 +25,7 @@
               v-model="searchMode"
               type="radio"
               value="and"
-              class="form-radio text-blue-600"
+              class="form-radio text-primary"
             >
             <span class="text-sm">AND</span>
           </label>
@@ -63,19 +63,12 @@
         <!-- バッチ編集モードボタン -->
         <div class="flex items-center gap-2">
           <span class="text-xs text-gray-500">{{ selectedBookmarks.length }} selected</span>
-          <button 
-            class="px-3 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white" 
-            :class="{'bg-red-500 hover:bg-red-600': batchEditMode}"
-            @click="toggleBatchEditMode"
-          >
-            {{ batchEditMode ? 'Cancel Batch Edit' : 'Batch Edit Tags' }}
-          </button>
-          <button 
+          <button
             v-if="selectedBookmarks.length > 0"
-            class="px-3 py-1 text-sm rounded bg-gray-300 hover:bg-gray-400" 
-            @click="clearAllSelection"
+            class="ml-auto px-4 py-2 bg-primary hover:bg-primary-hover text-primary-foreground rounded-md"
+            @click="batchEditMode = !batchEditMode"
           >
-            Clear Selection
+            {{ batchEditMode ? 'Cancel' : 'Batch Edit Tags' }}
           </button>
         </div>
       </div>

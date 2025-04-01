@@ -4,12 +4,12 @@
     <div class="flex justify-between items-center mb-3">
       <div
         class="text-sm"
-        :class="currentBookmark ? 'text-green-600' : 'text-gray-600'"
+        :class="currentBookmark ? 'text-primary' : 'text-muted'"
       >
         {{ message }}
       </div>
       <button 
-        class="p-1.5 rounded-full hover:bg-gray-200 transition-colors" 
+        class="p-1.5 rounded-full hover:bg-secondary transition-colors" 
         title="Settings"
         @click="openOptionsPage"
       >
@@ -19,7 +19,7 @@
     
     <div
       v-if="loading"
-      class="text-gray-600"
+      class="text-muted"
     >
       Loading...
     </div>
@@ -42,7 +42,7 @@
             :selected="false"
           >
             <button 
-              class="ml-1 text-blue-600 hover:text-blue-800 font-bold" 
+              class="ml-1 text-primary hover:text-primary-hover font-bold" 
               title="Remove tag"
               @click.stop="removeTag(tag)"
             >
@@ -67,7 +67,7 @@
       
       <div class="flex gap-2">
         <button 
-          class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md"
+          class="flex-grow bg-primary hover:bg-primary-hover text-primary-foreground font-medium py-2 px-4 rounded-md"
           @click="saveBookmark"
         >
           {{ currentBookmark ? 'Update' : 'Add to Bookmarks' }}
@@ -76,7 +76,7 @@
         <!-- ブックマーク削除ボタン（追加済みの場合のみ表示） -->
         <button 
           v-if="currentBookmark"
-          class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md"
+          class="bg-destructive hover:bg-destructive-hover text-destructive-foreground font-medium py-2 px-4 rounded-md"
           title="Delete bookmark"
           @click="deleteBookmark"
         >
