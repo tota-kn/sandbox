@@ -1,15 +1,9 @@
 <template>
   <div class="max-w-3xl mx-auto p-5 font-sans">
-    <h1 class="text-2xl font-bold text-gray-800 pb-3 mb-4 border-b-2 border-gray-100">
-      Bookmark Tag Manager
-    </h1>
+    <PageHeader>Bookmark Tag Manager</PageHeader>
     
     <div class="mb-6">
-      <div class="flex items-center mb-3">
-        <h2 class="text-xl font-semibold mr-4">
-          Tag List
-        </h2>
-      </div>
+      <SectionHeader>Tag List</SectionHeader>
 
       <!-- タグ検索ボックス -->
       <div class="mb-3">
@@ -34,11 +28,7 @@
     </div>
     
     <div class="mt-8">
-      <div class="flex justify-between items-center mb-3">
-        <h2 class="text-xl font-semibold">
-          Bookmark List
-        </h2>
-      </div>
+      <SectionHeader>Bookmark List</SectionHeader>
 
       <!-- ブックマーク検索ボックス -->
       <div class="mb-3">
@@ -78,6 +68,8 @@ import { ref, computed, onMounted } from 'vue'
 import TagBadge from '../../components/TagBadge.vue'
 import SearchBox from '../../components/SearchBox.vue'
 import FolderView from '../../components/FolderView.vue'
+import PageHeader from '../../components/PageHeader.vue'
+import SectionHeader from '../../components/SectionHeader.vue'
 import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
