@@ -17,12 +17,7 @@
       </button>
     </div>
     
-    <div
-      v-if="loading"
-      class="text-muted"
-    >
-      Loading...
-    </div>
+    <LoadingIndicator v-if="loading" />
     
     <div v-else>
       <div class="mb-4">
@@ -91,6 +86,7 @@
 import { ref, computed, onMounted } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
 import TagAddButton from '../../components/TagAddButton.vue';
+import LoadingIndicator from '../../components/LoadingIndicator.vue';
 import { extractTags, removeTagFromTitle } from '../../utils/tagUtils';
 import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil } from '../../utils/bookmarkUtils';
 import { BookOpenIcon } from '@heroicons/vue/24/outline';

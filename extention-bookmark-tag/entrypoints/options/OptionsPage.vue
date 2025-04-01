@@ -36,12 +36,7 @@
         />
       </div>
 
-      <div
-        v-if="loading"
-        class="py-4"
-      >
-        Loading...
-      </div>
+      <LoadingIndicator v-if="loading" />
       <div
         v-else-if="filteredBookmarks.length === 0"
         class="py-5 text-gray-500 italic"
@@ -68,6 +63,7 @@ import SearchBox from '../../components/SearchBox.vue'
 import FolderView from '../../components/FolderView.vue'
 import PageHeader from '../../components/PageHeader.vue'
 import SectionHeader from '../../components/SectionHeader.vue'
+import LoadingIndicator from '../../components/LoadingIndicator.vue'
 import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
