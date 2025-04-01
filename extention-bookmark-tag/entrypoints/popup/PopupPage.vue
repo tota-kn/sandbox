@@ -51,12 +51,10 @@
             @add-tag="addTag"
           />
           
-          <div
+          <EmptyStateMessage
             v-if="currentTags.length === 0"
-            class="text-sm text-gray-500 italic"
-          >
-            No tags
-          </div>
+            message="No tags"
+          />
         </div>
       </div>
       
@@ -87,6 +85,7 @@ import { ref, computed, onMounted } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
 import TagAddButton from '../../components/TagAddButton.vue';
 import LoadingIndicator from '../../components/LoadingIndicator.vue';
+import EmptyStateMessage from '../../components/EmptyStateMessage.vue';
 import { extractTags, removeTagFromTitle } from '../../utils/tagUtils';
 import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil } from '../../utils/bookmarkUtils';
 import { BookOpenIcon } from '@heroicons/vue/24/outline';

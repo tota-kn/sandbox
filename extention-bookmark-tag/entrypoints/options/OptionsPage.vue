@@ -1,17 +1,16 @@
 <template>
   <div class="max-w-3xl mx-auto p-5 font-sans">
     <PageHeader>Bookmark Tag Manager</PageHeader>  
+
     <div class="mb-6">
       <SectionHeader>Tag List</SectionHeader>
 
-      <!-- タグ検索ボックス -->
       <SearchBox 
         v-model="tagSearchQuery"
         class="mb-3" 
         placeholder="Search tags..."
       />
 
-      <!-- タグ一覧 -->
       <div class="flex flex-wrap gap-2">
         <TagBadge 
           v-for="tag in filteredTags" 
@@ -28,23 +27,19 @@
     <div class="mt-8">
       <SectionHeader>Bookmark List</SectionHeader>
 
-      <!-- ブックマーク検索ボックス -->
-      <div class="mb-3">
-        <SearchBox 
-          v-model="bookmarkSearchQuery" 
-          placeholder="Search by title or URL..."
-        />
-      </div>
+      <SearchBox 
+        v-model="bookmarkSearchQuery"
+        class="mb-3" 
+        placeholder="Search by title or URL..."
+      />
 
       <LoadingIndicator v-if="loading" />
-      <div
+
+      <EmptyStateMessage
         v-else-if="filteredBookmarks.length === 0"
-        class="py-5 text-gray-500 italic"
-      >
-        No bookmarks to display
-      </div>
+        message="No bookmarks to display"
+      />
       
-      <!-- フォルダ構造表示 -->
       <FolderView 
         :bookmarks="filteredBookmarks" 
         @update-title="updateBookmarkTitle"
@@ -64,6 +59,7 @@ import FolderView from '../../components/FolderView.vue'
 import PageHeader from '../../components/PageHeader.vue'
 import SectionHeader from '../../components/SectionHeader.vue'
 import LoadingIndicator from '../../components/LoadingIndicator.vue'
+import EmptyStateMessage from '../../components/EmptyStateMessage.vue'
 import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
