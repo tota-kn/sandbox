@@ -352,29 +352,6 @@ const toggleBookmarkSelection = (bookmark: ExtendedBookmark): void => {
 }
 
 /**
- * すべてのブックマークの選択を解除する
- * @returns {void}
- */
-const clearAllSelection = (): void => {
-  bookmarks.value.forEach(bookmark => {
-    bookmark.selected = false
-  })
-}
-
-/**
- * バッチ編集モードの切り替え
- * @returns {void}
- */
-const toggleBatchEditMode = (): void => {
-  batchEditMode.value = !batchEditMode.value
-  if (!batchEditMode.value) {
-    // バッチ編集モードを終了したら入力をクリア
-    batchTagToAdd.value = ''
-    batchTagToRemove.value = ''
-  }
-}
-
-/**
  * 選択されたブックマークに一括でタグを追加
  * @param {string} tagInput 追加するタグ
  * @returns {Promise<void>}
