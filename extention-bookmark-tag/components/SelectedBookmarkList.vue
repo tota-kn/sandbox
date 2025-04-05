@@ -207,6 +207,7 @@ const toggleAddTagForm = (): void => {
   if (!showAddTagForm.value) {
     showRemoveTagForm.value = false
     showAddTagForm.value = true
+    expanded.value = true // リストも自動的に展開する
     // 入力フィールドにフォーカスを当てる（次のティックで実行）
     nextTick(() => {
       addTagInput.value?.focus()
@@ -225,6 +226,7 @@ const toggleRemoveTagForm = (): void => {
   if (!showRemoveTagForm.value) {
     showAddTagForm.value = false
     showRemoveTagForm.value = true
+    expanded.value = true // リストも自動的に展開する
   } else {
     showRemoveTagForm.value = false
   }
