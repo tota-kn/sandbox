@@ -24,6 +24,13 @@
       </div>
     </div>
     
+    <!-- 選択済みブックマークセクションをコンポーネント化 -->
+    <SelectedBookmarkList
+      :bookmarks="selectedBookmarks"
+      @toggle-bookmark="toggleBookmarkSelection"
+      @clear-selections="clearAllSelections"
+    />
+    
     <div>
       <SectionHeader>Bookmark List</SectionHeader>
 
@@ -60,6 +67,7 @@ import PageHeader from '../../components/PageHeader.vue'
 import SectionHeader from '../../components/SectionHeader.vue'
 import LoadingIndicator from '../../components/LoadingIndicator.vue'
 import EmptyStateMessage from '../../components/EmptyStateMessage.vue'
+import SelectedBookmarkList from '../../components/SelectedBookmarkList.vue'
 import { extractTags } from '../../utils/tagUtils'
 import { flattenBookmarks, updateBookmark as updateBookmarkUtil, ExtendedBookmark, getAllBookmarksInFolder } from '../../utils/bookmarkUtils'
 
@@ -259,6 +267,30 @@ const updateBookmarkTitle = async (bookmarkId: string, newTitle: string): Promis
   } catch (error) {
     console.error('ブックマークの更新に失敗しました:', error)
   }
+}
+
+/** 選択されたブックマークのリストを計算する */
+const selectedBookmarks = computed(() => {
+  return bookmarks.value.filter(bookmark => !bookmark.isFolder && bookmark.selected)
+})
+
+/**
+ * タイトルからタグを抽出するユーティリティ関数（タグユーティリティのラッパー）
+ * @param {string} title ブックマークのタイトル
+ * @returns {string[]} タグのリスト
+ */
+const extractTagsFromTitle = (title: string): string[] => {
+  return extractTags(title)
+}
+
+/**
+ * 全ての選択をクリアする
+ * @returns {void}
+ */
+const clearAllSelections = (): void => {
+  bookmarks.value.forEach(bookmark => {
+    bookmark.selected = false
+  })
 }
 
 // コンポーネントのマウント時にブックマークを取得
