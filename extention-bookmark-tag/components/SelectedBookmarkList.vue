@@ -1,7 +1,5 @@
 <template>
   <div v-if="bookmarks.length > 0">
-    <SectionHeader>Selected Bookmarks</SectionHeader>
-    
     <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
       <div class="flex justify-between items-center mb-2">
         <div class="text-sm text-gray-500">
@@ -50,10 +48,9 @@
 <script setup lang="ts">
 import { ExtendedBookmark } from '../utils/bookmarkUtils'
 import { extractTags } from '../utils/tagUtils'
-import SectionHeader from './SectionHeader.vue'
 
 /** コンポーネントのプロパティ定義 */
-const props = defineProps<{
+defineProps<{
   /** 選択されたブックマークのリスト */
   bookmarks: ExtendedBookmark[]
 }>()

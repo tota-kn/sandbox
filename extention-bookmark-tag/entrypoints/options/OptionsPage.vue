@@ -25,18 +25,18 @@
     </div>
     
     <!-- 選択済みブックマークセクションをコンポーネント化 -->
-    <SelectedBookmarkList
-      :bookmarks="selectedBookmarks"
-      @toggle-bookmark="toggleBookmarkSelection"
-      @clear-selections="clearAllSelections"
-    />
     
-    <div>
+    <div class="space-y-4">
       <SectionHeader>Bookmark List</SectionHeader>
+      
+      <SelectedBookmarkList
+        :bookmarks="selectedBookmarks"
+        @toggle-bookmark="toggleBookmarkSelection"
+        @clear-selections="clearAllSelections"
+      />
 
       <SearchBox 
         v-model="bookmarkSearchQuery"
-        class="mb-3" 
         placeholder="Search by title or URL..."
       />
 
@@ -273,15 +273,6 @@ const updateBookmarkTitle = async (bookmarkId: string, newTitle: string): Promis
 const selectedBookmarks = computed(() => {
   return bookmarks.value.filter(bookmark => !bookmark.isFolder && bookmark.selected)
 })
-
-/**
- * タイトルからタグを抽出するユーティリティ関数（タグユーティリティのラッパー）
- * @param {string} title ブックマークのタイトル
- * @returns {string[]} タグのリスト
- */
-const extractTagsFromTitle = (title: string): string[] => {
-  return extractTags(title)
-}
 
 /**
  * 全ての選択をクリアする
