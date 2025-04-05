@@ -15,22 +15,11 @@
         @toggle-folder-expanded="$emit('toggle-folder-expanded', $event)"
         @toggle-folder-selection="$emit('toggle-folder-selection', $event)"
       />
-      
-      <!-- 通常のブックマークの場合 -->
-      <BookmarkItem 
-        v-else
-        :bookmark="child"
-        :selectable="true"
-        :selected="child.selected || false"
-        @update-title="$emit('update-title', child.id, $event)"
-        @toggle-select="$emit('toggle-select', child)"
-      />
     </template>
   </ul>
 </template>
 
 <script setup lang="ts">
-import BookmarkItem from './BookmarkItem.vue'
 import FolderItem from './FolderItem.vue'
 import { ExtendedBookmark } from '../utils/bookmarkUtils'
 import { computed } from 'vue'
@@ -45,11 +34,20 @@ const props = defineProps<{
 
 /**
  * ルートフォルダ内のアイテム（ブックマークとサブフォルダ）
+ * Vivaldiで重複表示されないように、最初に見つかったルートIDのみを使用
  */
 const rootItems = computed(() => {
-  // ルートフォルダのIDは通常 '0' または '1'
+  // まず親IDがないか'0'のアイテムを探す（主要なルート）
+  const mainRoot = props.bookmarks.find(b => !b.parentId || b.parentId === '0');
+  
+  if (mainRoot) {
+    // 最初に見つかったルートIDを使用
+    return props.bookmarks.filter(b => b.parentId === mainRoot.parentId);
+  }
+  
+  // バックアップとして従来のロジック（ID '1'も含む）
   return props.bookmarks.filter(b => 
-    b.parentId === '0' || b.parentId === '1'
+    !b.parentId || b.parentId === '0' || b.parentId === '1'
   );
 })
 
