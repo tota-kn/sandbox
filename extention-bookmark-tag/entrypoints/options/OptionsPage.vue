@@ -24,12 +24,11 @@
       </div>
     </div>
     
-    <!-- 選択済みブックマークセクションをコンポーネント化 -->
-    
     <div class="space-y-4">
       <SectionHeader>Bookmark List</SectionHeader>
-      
+
       <SelectedBookmarkList
+        v-if="selectedBookmarks.length > 0"
         :bookmarks="selectedBookmarks"
         @toggle-bookmark="toggleBookmarkSelection"
         @clear-selections="clearAllSelections"
