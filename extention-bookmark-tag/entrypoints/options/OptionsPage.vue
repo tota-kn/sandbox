@@ -32,6 +32,8 @@
         :bookmarks="selectedBookmarks"
         @toggle-bookmark="toggleBookmarkSelection"
         @clear-selections="clearAllSelections"
+        @add-tag="addTagToSelectedBookmarks"
+        @remove-tag="removeTagFromSelectedBookmarks"
       />
 
       <SearchBox 
@@ -296,4 +298,78 @@ onMounted(() => {
 const toggleBookmarkSelection = (bookmark: ExtendedBookmark): void => {
   bookmark.selected = !bookmark.selected
 }
+
+/**
+ * 選択中のすべてのブックマークに指定したタグを追加する
+ * @param {string} tag 追加するタグ名（@なし）
+ * @returns {Promise<void>}
+ */
+const addTagToSelectedBookmarks = async (tag: string): Promise<void> => {
+  if (!tag || selectedBookmarks.value.length === 0) return;
+
+  try {
+    loading.value = true;
+    // タグ形式に整形（@がない場合は追加）
+    const formattedTag = tag.startsWith('@') ? tag : `@${tag}`;
+    
+    // 選択中のすべてのブックマークにタグを追加
+    for (const bookmark of selectedBookmarks.value) {
+      const bookmarkTags = extractTags(bookmark.title || '');
+      
+      // タグがすでに存在する場合はスキップ
+      if (bookmarkTags.includes(tag)) continue;
+      
+      // タイトルの末尾にスペースとタグを追加
+      const newTitle = (bookmark.title || '').trim() + ` ${formattedTag}`;
+      
+      // bookmarkUtils.tsの関数を使用してブックマークを更新
+      await updateBookmarkUtil(bookmark.id, newTitle);
+      bookmark.title = newTitle; // ローカルデータも更新
+    }
+    
+    loading.value = false;
+  } catch (error) {
+    console.error('タグの一括追加に失敗しました:', error);
+    loading.value = false;
+  }
+};
+
+/**
+ * 選択中のすべてのブックマークから指定したタグを削除する
+ * @param {string} tag 削除するタグ名（@なし）
+ * @returns {Promise<void>}
+ */
+const removeTagFromSelectedBookmarks = async (tag: string): Promise<void> => {
+  if (!tag || selectedBookmarks.value.length === 0) return;
+  
+  try {
+    loading.value = true;
+    // タグ形式に整形（@がない場合は追加）
+    const formattedTag = tag.startsWith('@') ? tag : `@${tag}`;
+    
+    // 選択中のすべてのブックマークからタグを削除
+    for (const bookmark of selectedBookmarks.value) {
+      const currentTitle = bookmark.title || '';
+      
+      // タグを削除（正規表現を使用して "@タグ名" を削除し、余分なスペースを整理）
+      const newTitle = currentTitle
+        .replace(new RegExp(`\\s*${formattedTag}\\s*`), ' ')
+        .trim();
+      
+      // bookmarkUtils.tsの関数を使用してブックマークを更新
+      await updateBookmarkUtil(bookmark.id, newTitle);
+      bookmark.title = newTitle; // ローカルデータも更新
+    }
+    
+    // もし削除したタグが選択中のタグに含まれていれば、それも削除
+    if (selectedTags.value.includes(tag)) {
+      selectedTags.value = selectedTags.value.filter(t => t !== tag);
+    }
+    
+    loading.value = false;
+  } catch (error) {
+    console.error('タグの一括削除に失敗しました:', error);
+    loading.value = false;
+  }
+};
 </script>
