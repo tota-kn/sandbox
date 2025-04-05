@@ -89,7 +89,7 @@ const folderChildren = computed(() => {
 /**
  * 親コンポーネントに通知するイベント
  */
-const emit = defineEmits<{
+defineEmits<{
   /** タイトル更新イベント */
   (e: 'update-title', id: string, newTitle: string): void
   /** ブックマーク選択状態変更イベント */
