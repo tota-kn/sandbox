@@ -1,6 +1,6 @@
 <template>
-  <li class="mb-1">
-    <div class="flex items-center py-2 px-1 hover:bg-gray-50 rounded">
+  <li class="">
+    <div class="flex items-center py-1 px-1 hover:bg-gray-50 rounded">
       <button 
         class="mr-2 w-4 h-4 flex items-center justify-center" 
         @click="$emit('toggle-folder-expanded', folder)"

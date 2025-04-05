@@ -1,5 +1,5 @@
 <template>
-  <li class="border-b last:border-b-0 py-3">
+  <li class="border-b last:border-b-0 py-2">
     <div class="flex items-start">
       <!-- 選択チェックボックス -->
       <div
@@ -48,9 +48,16 @@
           <div class="flex-1">
             <div class="flex justify-between items-center">
               <!-- タイトルとタグを左に配置 -->
-              <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="text-base font-medium">
-                  {{ displayTitle }}
+              <div class="flex items-center gap-1 flex-wrap">
+                <h3 class="text-sm font-medium">
+                  <a 
+                    :href="bookmark.url" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="text-primary hover:text-primary-hover hover:underline"
+                  >
+                    {{ displayTitle }}
+                  </a>
                 </h3>
                 
                 <!-- タグ -->
