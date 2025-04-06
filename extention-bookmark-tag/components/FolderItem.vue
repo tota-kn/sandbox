@@ -1,22 +1,20 @@
 <template>
-  <li class="">
+  <li>
     <div
       class="flex items-center py-1 hover:bg-gray-50 rounded hover:text-primary cursor-pointer"
       @click="$emit('toggle-folder-expanded', folder)"
     >
       <!-- フォルダ選択チェックボックス -->
-      <div class="mr-2">
-        <input 
-          type="checkbox" 
-          :checked="getAllBookmarksInFolder(folder, allBookmarks).some(b => b.selected && !b.isFolder)"
-          :indeterminate.prop="
-            getAllBookmarksInFolder(folder, allBookmarks).some(b => b.selected && !b.isFolder) && 
-              !getAllBookmarksInFolder(folder, allBookmarks).filter(b => !b.isFolder).every(b => b.selected)
-          "
-          class="h-4 w-4 text-primary"
-          @change="$emit('toggle-folder-selection', folder)"
-        >
-      </div>
+      <input 
+        type="checkbox" 
+        :checked="getAllBookmarksInFolder(folder, allBookmarks).some(b => b.selected && !b.isFolder)"
+        :indeterminate.prop="
+          getAllBookmarksInFolder(folder, allBookmarks).some(b => b.selected && !b.isFolder) && 
+            !getAllBookmarksInFolder(folder, allBookmarks).filter(b => !b.isFolder).every(b => b.selected)
+        "
+        class="h-4 w-4 text-primary mr-2"
+        @change="$emit('toggle-folder-selection', folder)"
+      >
 
       
       
