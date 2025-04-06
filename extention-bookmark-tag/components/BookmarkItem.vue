@@ -68,13 +68,13 @@
                     :tag="tag"
                     size="small"
                   >
-                    <button 
-                      class="ml-1 text-primary hover:text-primary-hover font-bold" 
+                    <IconButton
+                      class="ml-1" 
                       title="Remove tag"
                       @click.stop="removeTag(tag)"
                     >
-                      ×
-                    </button>
+                      <XMarkIcon class="size-3" />
+                    </IconButton>
                   </TagBadge>
                   <TagAddButton 
                     :current-tags="bookmarkTags"
@@ -106,7 +106,7 @@ import TagBadge from './TagBadge.vue'
 import TagAddButton from './TagAddButton.vue'
 import IconButton from './IconButton.vue'
 import { extractTags, removeTagFromTitle } from '../utils/tagUtils'
-import { PencilSquareIcon} from '@heroicons/vue/24/outline'
+import { PencilSquareIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 /**
  * ブックマークアイテムのプロパティ定義
