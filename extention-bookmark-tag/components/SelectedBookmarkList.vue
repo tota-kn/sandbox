@@ -424,10 +424,10 @@ const loadFolders = async (): Promise<void> => {
 
 /**
  * ブックマークツリーを再帰的に処理してフォルダ一覧を作成する
- * @param {any} node ブックマークツリーのノード
+ * @param {chrome.bookmarks.BookmarkTreeNode} node ブックマークツリーのノード
  * @param {number} depth 現在の深さ
  */
-const processFolders = (node: any, depth: number): void => {
+const processFolders = (node: chrome.bookmarks.BookmarkTreeNode, depth: number): void => {
   // ノードがフォルダの場合（urlがない場合はフォルダとみなす）
   if (!node.url) {
     // ルートフォルダ（id:0）は特殊なので除外

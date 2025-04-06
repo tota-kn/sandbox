@@ -359,7 +359,7 @@ const removeTagFromSelectedBookmarks = async (tag: string): Promise<void> => {
       
       // bookmarkUtils.tsの関数を使用してブックマークを更新
       await updateBookmarkUtil(bookmark.id, newTitle);
-      bookmark.title =新しいタイトル; // ローカルデータも更新
+      bookmark.title = newTitle // ローカルデータも更新
     }
     
     // もし削除したタグが選択中のタグに含まれていれば、それも削除
