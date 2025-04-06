@@ -1,6 +1,5 @@
 <template>
   <div class="w-80 p-4 font-sans">
-    <!-- ヘッダー部分を追加して右上にオプションリンクを配置 -->
     <div class="flex justify-between items-center mb-3">
       <div
         class="text-sm"
@@ -8,13 +7,12 @@
       >
         {{ message }}
       </div>
-      <button 
-        class="p-1.5 rounded-full hover:bg-secondary transition-colors" 
+      <IconButton 
         title="Settings"
         @click="openOptionsPage"
       >
         <BookOpenIcon class="size-6" />
-      </button>
+      </IconButton>
     </div>
     
     <LoadingIndicator v-if="loading" />
@@ -86,6 +84,7 @@ import TagBadge from '../../components/TagBadge.vue';
 import TagAddButton from '../../components/TagAddButton.vue';
 import LoadingIndicator from '../../components/LoadingIndicator.vue';
 import EmptyStateMessage from '../../components/EmptyStateMessage.vue';
+import IconButton from '../../components/IconButton.vue';
 import { extractTags, removeTagFromTitle } from '../../utils/tagUtils';
 import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil } from '../../utils/bookmarkUtils';
 import { BookOpenIcon } from '@heroicons/vue/24/outline';

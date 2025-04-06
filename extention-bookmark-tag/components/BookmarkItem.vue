@@ -84,13 +84,14 @@
               </div>
 
               <!-- 編集ボタンを右に配置 -->
-              <button 
-                class="p-1 text-muted hover:text-foreground rounded-full hover:bg-secondary ml-2 shrink-0" 
+              <IconButton
+                size="sm"
+                class="ml-2 shrink-0"
                 title="編集"
                 @click="startEdit"
               >
                 <PencilSquareIcon class="size-4" />
-              </button>
+              </IconButton>
             </div>
           </div>
         </div>
@@ -103,6 +104,7 @@
 import { ref, computed, nextTick } from 'vue'
 import TagBadge from './TagBadge.vue'
 import TagAddButton from './TagAddButton.vue'
+import IconButton from './IconButton.vue'
 import { extractTags, removeTagFromTitle } from '../utils/tagUtils'
 import { PencilSquareIcon} from '@heroicons/vue/24/outline'
 

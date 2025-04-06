@@ -20,14 +20,15 @@
       @click.stop
     >
     <span v-else>{{ displayTag }}</span>
-    <button 
+    <IconButton 
       v-if="showEditButton && !isEditing" 
-      class="ml-1 text-muted hover:text-gray-700" 
+      size="sm"
+      class="ml-1" 
       title="Edit tag"
       @click.stop="startEditing"
     >
       <PencilSquareIcon class="size-4" />
-    </button>
+    </IconButton>
     <slot />
   </div>
 </template>
@@ -36,6 +37,7 @@
 import { computed, ref, nextTick } from 'vue'
 import { removeTagPrefix, addTagPrefix } from '../utils/tagUtils'
 import { PencilSquareIcon} from '@heroicons/vue/24/outline'
+import IconButton from './IconButton.vue'
 
 /** 
  * コンポーネントのプロパティ定義
