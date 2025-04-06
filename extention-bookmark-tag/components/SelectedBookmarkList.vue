@@ -27,6 +27,12 @@
           Remove tag
         </button>
         <button 
+          class="text-sm text-purple-600 hover:text-purple-800" 
+          @click.stop="toggleFolderMoveForm"
+        >
+          Move
+        </button>
+        <button 
           class="text-sm text-gray-600 hover:text-gray-800" 
           @click.stop="clearAllSelections"
         >
@@ -89,6 +95,93 @@
       </div>
     </div>
 
+    <!-- フォルダ移動フォーム (インライン) -->
+    <div 
+      v-if="showFolderMoveForm" 
+      class="mt-2 p-2 bg-white rounded border border-gray-200"
+    >
+      <div class="mb-2">
+        <div class="flex flex-col">
+          <div class="mb-2">
+            <label class="block text-sm font-medium text-gray-700">移動先フォルダ</label>
+            <div class="flex flex-col max-h-60 overflow-y-auto border border-gray-200 rounded p-2 mt-1">
+              <!-- フォルダ選択リスト -->
+              <div 
+                v-if="folderList.length > 0"
+                class="space-y-1"
+              >
+                <div 
+                  v-for="folder in folderList" 
+                  :key="folder.id"
+                  class="flex items-center hover:bg-gray-100 p-1 rounded cursor-pointer"
+                  @click="selectFolder(folder)"
+                >
+                  <span
+                    class="w-4 ml-2"
+                    :style="`margin-left: ${folder.depth * 16}px`"
+                  >
+                    📁
+                  </span>
+                  <span class="ml-2">{{ folder.title }}</span>
+                </div>
+              </div>
+              <div
+                v-else
+                class="text-center py-2 text-gray-500"
+              >
+                フォルダを読み込み中...
+              </div>
+            </div>
+          </div>
+          
+          <!-- 新規フォルダ作成フォーム -->
+          <div class="mb-2">
+            <div class="flex items-center">
+              <input
+                v-model="newFolderName"
+                type="text"
+                class="flex-grow p-1 border rounded mr-2"
+                placeholder="新規フォルダ名"
+              >
+              <button
+                class="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300"
+                :disabled="!newFolderName.trim()"
+                @click="createAndSelectFolder"
+              >
+                作成して選択
+              </button>
+            </div>
+          </div>
+          
+          <!-- 選択中のフォルダ表示 -->
+          <div
+            v-if="selectedFolder"
+            class="mb-2 p-2 bg-gray-100 rounded"
+          >
+            <p class="text-sm">
+              選択中: <span class="font-medium">{{ selectedFolder.title }}</span>
+            </p>
+          </div>
+          
+          <div class="flex justify-end">
+            <button
+              class="px-3 py-1 bg-gray-200 rounded mr-2"
+              @click="cancelFolderMoveForm"
+            >
+              キャンセル
+            </button>
+            <button
+              class="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300"
+              :disabled="!selectedFolder"
+              @click="handleMoveBookmarks"
+            >
+              移動する
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <ul
       v-if="expanded"
       class="space-y-2 mt-2"
@@ -124,7 +217,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { ExtendedBookmark } from '../utils/bookmarkUtils'
 import { extractTags } from '../utils/tagUtils'
 
@@ -144,6 +237,8 @@ const emit = defineEmits<{
   'add-tag': [tag: string]
   /** 選択されたブックマークからタグを削除 */
   'remove-tag': [tag: string]
+  /** 選択したブックマークを指定フォルダに移動 */
+  'move-bookmarks': [folderId: string]
 }>()
 
 /** 開閉状態を管理する変数（デフォルトは閉じている） */
@@ -152,10 +247,18 @@ const expanded = ref(false)
 const showAddTagForm = ref(false)
 /** タグ削除フォームの表示状態 */
 const showRemoveTagForm = ref(false)
+/** フォルダ移動フォームの表示状態 */
+const showFolderMoveForm = ref(false)
 /** タグ入力値 */
 const tagInput = ref('')
 /** タグ入力フィールドへの参照 */
 const addTagInput = ref<HTMLInputElement | null>(null)
+/** フォルダリスト */
+const folderList = ref<Array<{id: string, title: string, depth: number}>>([])
+/** 選択中のフォルダ */
+const selectedFolder = ref<{id: string, title: string, depth: number} | null>(null)
+/** 新規フォルダ名 */
+const newFolderName = ref('')
 
 /**
  * タイトルからタグを抽出するユーティリティ関数
@@ -203,9 +306,10 @@ const toggleExpanded = (): void => {
  * タグ追加フォームの表示/非表示を切り替える
  */
 const toggleAddTagForm = (): void => {
-  // フォームを表示する場合、削除フォームは閉じる
+  // フォームを表示する場合、他のフォームは閉じる
   if (!showAddTagForm.value) {
     showRemoveTagForm.value = false
+    showFolderMoveForm.value = false
     showAddTagForm.value = true
     expanded.value = true // リストも自動的に展開する
     // 入力フィールドにフォーカスを当てる（次のティックで実行）
@@ -222,13 +326,31 @@ const toggleAddTagForm = (): void => {
  * タグ削除フォームの表示/非表示を切り替える
  */
 const toggleRemoveTagForm = (): void => {
-  // フォームを表示する場合、追加フォームは閉じる
+  // フォームを表示する場合、他のフォームは閉じる
   if (!showRemoveTagForm.value) {
     showAddTagForm.value = false
+    showFolderMoveForm.value = false
     showRemoveTagForm.value = true
     expanded.value = true // リストも自動的に展開する
   } else {
     showRemoveTagForm.value = false
+  }
+  event?.stopPropagation()
+}
+
+/**
+ * フォルダ移動フォームの表示/非表示を切り替える
+ */
+const toggleFolderMoveForm = (): void => {
+  // フォームを表示する場合、他のフォームは閉じる
+  if (!showFolderMoveForm.value) {
+    showAddTagForm.value = false
+    showRemoveTagForm.value = false
+    showFolderMoveForm.value = true
+    expanded.value = true // リストも自動的に展開する
+    loadFolders() // フォルダ一覧を読み込む
+  } else {
+    showFolderMoveForm.value = false
   }
   event?.stopPropagation()
 }
@@ -240,6 +362,16 @@ const cancelTagForm = (): void => {
   showAddTagForm.value = false
   showRemoveTagForm.value = false
   tagInput.value = ''
+  event?.stopPropagation()
+}
+
+/**
+ * フォルダ移動フォームをキャンセルする
+ */
+const cancelFolderMoveForm = (): void => {
+  showFolderMoveForm.value = false
+  selectedFolder.value = null
+  newFolderName.value = ''
   event?.stopPropagation()
 }
 
@@ -269,4 +401,112 @@ const handleRemoveTag = (tag: string): void => {
   // 削除後も削除フォームを表示したままにする
   // ユーザーが複数のタグを削除できるようにするため
 }
+
+/**
+ * フォルダ一覧を再帰的に取得する
+ * @returns {Promise<void>}
+ */
+const loadFolders = async (): Promise<void> => {
+  try {
+    // フォルダ一覧をクリア
+    folderList.value = []
+    
+    // Chrome拡張のブックマークAPIを使用してフォルダツリーを取得
+    const bookmarkTree = await chrome.bookmarks.getTree()
+    
+    // ツリーを平坦化してフォルダのみを抽出
+    processFolders(bookmarkTree[0], 0)
+    
+  } catch (error) {
+    console.error('フォルダの取得に失敗しました:', error)
+  }
+}
+
+/**
+ * ブックマークツリーを再帰的に処理してフォルダ一覧を作成する
+ * @param {any} node ブックマークツリーのノード
+ * @param {number} depth 現在の深さ
+ */
+const processFolders = (node: any, depth: number): void => {
+  // ノードがフォルダの場合（urlがない場合はフォルダとみなす）
+  if (!node.url) {
+    // ルートフォルダ（id:0）は特殊なので除外
+    if (node.id !== '0') {
+      folderList.value.push({
+        id: node.id,
+        title: node.title || 'フォルダ',
+        depth: depth
+      })
+    }
+    
+    // 子ノードを再帰的に処理
+    if (node.children) {
+      for (const child of node.children) {
+        processFolders(child, depth + 1)
+      }
+    }
+  }
+}
+
+/**
+ * フォルダを選択する
+ * @param {Object} folder 選択するフォルダ情報
+ */
+const selectFolder = (folder: {id: string, title: string, depth: number}): void => {
+  selectedFolder.value = folder
+}
+
+/**
+ * 新規フォルダを作成して選択する
+ * @returns {Promise<void>}
+ */
+const createAndSelectFolder = async (): Promise<void> => {
+  if (!newFolderName.value.trim()) return
+  
+  try {
+    // Chrome拡張のブックマークAPIを使用して新規フォルダを作成
+    // 親フォルダが選択されている場合はその中に作成、そうでなければルートに作成
+    const parentId = selectedFolder.value?.id || '1' // デフォルトはルートフォルダ
+    
+    const newFolder = await chrome.bookmarks.create({
+      parentId,
+      title: newFolderName.value.trim(),
+    })
+    
+    // 作成したフォルダを選択状態にする
+    selectFolder({
+      id: newFolder.id,
+      title: newFolder.title || '新規フォルダ',
+      depth: selectedFolder.value ? selectedFolder.value.depth + 1 : 0
+    })
+    
+    // 作成後はフォルダ一覧を再読み込み
+    await loadFolders()
+    
+    // 入力をクリア
+    newFolderName.value = ''
+    
+  } catch (error) {
+    console.error('フォルダの作成に失敗しました:', error)
+    alert('フォルダの作成に失敗しました')
+  }
+}
+
+/**
+ * 選択したブックマークを指定フォルダに移動する
+ */
+const handleMoveBookmarks = (): void => {
+  if (!selectedFolder.value) return
+  
+  // 親コンポーネントに移動イベントを発行
+  emit('move-bookmarks', selectedFolder.value.id)
+  
+  // フォームをクリア
+  cancelFolderMoveForm()
+}
+
+// コンポーネントのマウント時に初期処理
+onMounted(() => {
+  // 特に必要な初期化処理がなければ空でOK
+})
 </script>

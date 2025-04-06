@@ -34,6 +34,7 @@
         @clear-selections="clearAllSelections"
         @add-tag="addTagToSelectedBookmarks"
         @remove-tag="removeTagFromSelectedBookmarks"
+        @move-bookmarks="moveSelectedBookmarks"
       />
 
       <SearchBox 
@@ -358,7 +359,7 @@ const removeTagFromSelectedBookmarks = async (tag: string): Promise<void> => {
       
       // bookmarkUtils.tsの関数を使用してブックマークを更新
       await updateBookmarkUtil(bookmark.id, newTitle);
-      bookmark.title = newTitle; // ローカルデータも更新
+      bookmark.title =新しいタイトル; // ローカルデータも更新
     }
     
     // もし削除したタグが選択中のタグに含まれていれば、それも削除
@@ -370,6 +371,40 @@ const removeTagFromSelectedBookmarks = async (tag: string): Promise<void> => {
   } catch (error) {
     console.error('タグの一括削除に失敗しました:', error);
     loading.value = false;
+  }
+};
+
+/**
+ * 選択したブックマークを指定フォルダに移動する
+ * @param {string} folderId 移動先フォルダのID
+ * @returns {Promise<void>}
+ */
+const moveSelectedBookmarks = async (folderId: string): Promise<void> => {
+  if (!folderId || selectedBookmarks.value.length === 0) return;
+  
+  try {
+    loading.value = true;
+    
+    // 選択したブックマークを移動
+    for (const bookmark of selectedBookmarks.value) {
+      try {
+        // Chrome拡張のブックマークAPIを使用して移動
+        await chrome.bookmarks.move(bookmark.id, { parentId: folderId });
+      } catch (error) {
+        console.error(`ブックマークの移動に失敗しました (ID: ${bookmark.id}):`, error);
+      }
+    }
+    
+    // 移動完了後、ブックマーク一覧を再取得
+    await fetchBookmarks();
+    
+    loading.value = false;
+  } catch (error) {
+    console.error('ブックマークの移動中にエラーが発生しました:', error);
+    loading.value = false;
+    
+    // エラー通知
+    alert('一部のブックマークの移動に失敗しました。詳細はコンソールを確認してください。');
   }
 };
 </script>
