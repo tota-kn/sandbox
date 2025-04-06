@@ -1,21 +1,15 @@
 <template>
   <ul class="list-none p-0">
-    <!-- ルートフォルダ内のアイテムを直接表示 -->
-    <template
+    <FolderItem
       v-for="child in rootItems"
       :key="child.id"
-    >
-      <!-- フォルダの場合 -->
-      <FolderItem
-        v-if="child.isFolder"
-        :folder="child"
-        :all-bookmarks="bookmarks"
-        @update-title="(id, newTitle) => $emit('update-title', id, newTitle)"
-        @toggle-select="$emit('toggle-select', $event)"
-        @toggle-folder-expanded="$emit('toggle-folder-expanded', $event)"
-        @toggle-folder-selection="$emit('toggle-folder-selection', $event)"
-      />
-    </template>
+      :folder="child"
+      :all-bookmarks="bookmarks"
+      @update-title="(id, newTitle) => $emit('update-title', id, newTitle)"
+      @toggle-select="$emit('toggle-select', $event)"
+      @toggle-folder-expanded="$emit('toggle-folder-expanded', $event)"
+      @toggle-folder-selection="$emit('toggle-folder-selection', $event)"
+    />
   </ul>
 </template>
 

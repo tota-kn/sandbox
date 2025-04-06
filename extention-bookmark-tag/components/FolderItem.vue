@@ -1,6 +1,9 @@
 <template>
   <li class="">
-    <div class="flex items-center py-1 hover:bg-gray-50 rounded">
+    <div
+      class="flex items-center py-1 hover:bg-gray-50 rounded hover:text-primary cursor-pointer"
+      @click="$emit('toggle-folder-expanded', folder)"
+    >
       <!-- フォルダ選択チェックボックス -->
       <div class="mr-2">
         <input 
@@ -16,13 +19,6 @@
       </div>
 
       
-      <button 
-        class="mr-2 w-4 h-4 flex items-center justify-center" 
-        @click="$emit('toggle-folder-expanded', folder)"
-      >
-        <span v-if="folder.expanded">▼</span>
-        <span v-else>▶</span>
-      </button>
       
       <span class="font-medium flex items-center space-x-2">
         <FolderIcon class="size-4 text-muted" />
@@ -31,6 +27,13 @@
       <span class="ml-2 text-xs text-muted">
         ({{ getAllBookmarksInFolder(folder, allBookmarks).filter(b => !b.isFolder).length }})
       </span>
+
+      <div      
+        class="ml-2 size-4"
+      >
+        <ChevronDownIcon v-if="folder.expanded" />
+        <ChevronRightIcon v-else />
+      </div>
     </div>
     
     <!-- 展開時の中身表示 -->
@@ -67,7 +70,7 @@
 <script setup lang="ts">
 import BookmarkItem from './BookmarkItem.vue'
 import { ExtendedBookmark, getAllBookmarksInFolder } from '../utils/bookmarkUtils'
-import { FolderIcon } from '@heroicons/vue/24/outline'
+import { FolderIcon, ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
 import { computed } from 'vue'
 
 /**
