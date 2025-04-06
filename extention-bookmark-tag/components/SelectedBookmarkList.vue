@@ -27,7 +27,7 @@
           Remove tag
         </BaseButton>
         <BaseButton 
-          variant="outline"
+          variant="secondary"
           @click.stop="toggleFolderMoveForm"
         >
           Move

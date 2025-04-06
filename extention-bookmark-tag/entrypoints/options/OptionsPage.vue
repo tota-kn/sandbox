@@ -2,12 +2,11 @@
   <div class="max-w-4xl mx-auto p-5 space-y-4 font-sans">
     <PageHeader>Bookmark Tag Manager</PageHeader>  
 
-    <div>
+    <div class="space-y-4">
       <SectionHeader>Tag List</SectionHeader>
 
       <SearchBox 
         v-model="tagSearchQuery"
-        class="mb-3" 
         placeholder="Search tags..."
       />
 
@@ -49,7 +48,8 @@
         message="No bookmarks to display"
       />
       
-      <FolderView 
+      <FolderView
+        v-else
         :bookmarks="filteredBookmarks" 
         @update-title="updateBookmarkTitle"
         @toggle-select="toggleBookmarkSelection"
