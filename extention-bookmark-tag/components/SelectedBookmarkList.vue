@@ -4,13 +4,16 @@
     class="bg-gray-50 rounded-lg p-3 border border-gray-200"
   >
     <div
-      class="flex justify-between items-center cursor-pointer"
-      @click="toggleExpanded"
+      class="flex justify-between items-center"
     >
-      <div class="text-sm text-gray-500 flex items-center">
-        <span class="mr-2">
-          {{ expanded ? '▼' : '▶' }}
-        </span>
+      <div
+        class="text-sm text-gray-500 flex items-center"
+        @click="toggleExpanded"
+      >
+        <IconButton class="size-4 mr-2">
+          <ChevronDownIcon v-if="expanded" />
+          <ChevronRightIcon v-else />
+        </IconButton>
         <span>{{ bookmarks.length }} bookmarks selected</span>
       </div>
       <div class="flex space-x-2">
@@ -230,6 +233,9 @@ import { ref, computed, nextTick, onMounted } from 'vue'
 import { ExtendedBookmark } from '../utils/bookmarkUtils'
 import { extractTags } from '../utils/tagUtils'
 import BaseButton from './BaseButton.vue'
+import IconButton from './IconButton.vue';
+import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
+
 
 /** コンポーネントのプロパーネントのプロパティ定義 */
 const props = defineProps<{
