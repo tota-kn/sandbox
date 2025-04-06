@@ -14,30 +14,30 @@
         <span>{{ bookmarks.length }} bookmarks selected</span>
       </div>
       <div class="flex space-x-2">
-        <button 
-          class="text-sm text-blue-600 hover:text-blue-800" 
+        <BaseButton 
+          variant="primary"
           @click.stop="toggleAddTagForm"
         >
           Add tag
-        </button>
-        <button 
-          class="text-sm text-red-600 hover:text-red-800" 
+        </BaseButton>
+        <BaseButton 
+          variant="destructive"
           @click.stop="toggleRemoveTagForm"
         >
           Remove tag
-        </button>
-        <button 
-          class="text-sm text-purple-600 hover:text-purple-800" 
+        </BaseButton>
+        <BaseButton 
+          variant="outline"
           @click.stop="toggleFolderMoveForm"
         >
           Move
-        </button>
-        <button 
-          class="text-sm text-gray-600 hover:text-gray-800" 
+        </BaseButton>
+        <BaseButton 
+          variant="link"
           @click.stop="clearAllSelections"
         >
           Clear selections
-        </button>
+        </BaseButton>
       </div>
     </div>
     
@@ -55,18 +55,21 @@
           placeholder="Enter tag name (without @)"
           @keyup.enter="handleAddTag"
         >
-        <button 
-          class="px-3 py-1 bg-blue-500 text-white rounded"
+        <BaseButton 
+          variant="primary"
+          size="sm"
           @click="handleAddTag"
         >
           Add
-        </button>
-        <button 
-          class="ml-2 px-3 py-1 bg-gray-200 rounded"
+        </BaseButton>
+        <BaseButton 
+          variant="secondary"
+          size="sm"
+          class-name="ml-2"
           @click="cancelTagForm"
         >
           Cancel
-        </button>
+        </BaseButton>
       </div>
     </div>
     
@@ -76,22 +79,24 @@
       class="mt-2 p-2 bg-white rounded border border-gray-200"
     >
       <div class="flex flex-wrap gap-2 mb-2">
-        <button
+        <BaseButton
           v-for="tag in allTagsInSelectedBookmarks"
           :key="tag"
-          class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+          variant="secondary"
+          size="sm"
           @click="handleRemoveTag(tag)"
         >
           {{ tag }} ×
-        </button>
+        </BaseButton>
       </div>
       <div class="flex justify-end">
-        <button 
-          class="px-3 py-1 bg-gray-200 rounded"
+        <BaseButton 
+          variant="secondary"
+          size="sm"
           @click="cancelTagForm"
         >
           Close
-        </button>
+        </BaseButton>
       </div>
     </div>
 
@@ -143,13 +148,14 @@
                 class="flex-grow p-1 border rounded mr-2"
                 placeholder="新規フォルダ名"
               >
-              <button
-                class="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300"
+              <BaseButton
+                variant="primary"
+                size="sm"
                 :disabled="!newFolderName.trim()"
                 @click="createAndSelectFolder"
               >
                 作成して選択
-              </button>
+              </BaseButton>
             </div>
           </div>
           
@@ -164,19 +170,22 @@
           </div>
           
           <div class="flex justify-end">
-            <button
-              class="px-3 py-1 bg-gray-200 rounded mr-2"
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              class-name="mr-2"
               @click="cancelFolderMoveForm"
             >
               キャンセル
-            </button>
-            <button
-              class="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300"
+            </BaseButton>
+            <BaseButton
+              variant="primary"
+              size="sm"
               :disabled="!selectedFolder"
               @click="handleMoveBookmarks"
             >
               移動する
-            </button>
+            </BaseButton>
           </div>
         </div>
       </div>
@@ -220,6 +229,7 @@
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { ExtendedBookmark } from '../utils/bookmarkUtils'
 import { extractTags } from '../utils/tagUtils'
+import BaseButton from './BaseButton.vue'
 
 /** コンポーネントのプロパーネントのプロパティ定義 */
 const props = defineProps<{
