@@ -1,14 +1,6 @@
 <template>
   <li class="">
-    <div class="flex items-center py-1 px-1 hover:bg-gray-50 rounded">
-      <button 
-        class="mr-2 w-4 h-4 flex items-center justify-center" 
-        @click="$emit('toggle-folder-expanded', folder)"
-      >
-        <span v-if="folder.expanded">▼</span>
-        <span v-else>▶</span>
-      </button>
-      
+    <div class="flex items-center py-1 hover:bg-gray-50 rounded">
       <!-- フォルダ選択チェックボックス -->
       <div class="mr-2">
         <input 
@@ -22,6 +14,15 @@
           @change="$emit('toggle-folder-selection', folder)"
         >
       </div>
+
+      
+      <button 
+        class="mr-2 w-4 h-4 flex items-center justify-center" 
+        @click="$emit('toggle-folder-expanded', folder)"
+      >
+        <span v-if="folder.expanded">▼</span>
+        <span v-else>▶</span>
+      </button>
       
       <span class="font-medium flex items-center space-x-2">
         <FolderIcon class="size-4 text-muted" />

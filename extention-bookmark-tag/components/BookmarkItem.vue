@@ -1,10 +1,10 @@
 <template>
   <li class="border-b last:border-b-0 py-2">
-    <div class="flex items-start">
+    <div class="flex items-center">
       <!-- 選択チェックボックス -->
       <div
         v-if="selectable"
-        class="mr-3 mt-1"
+        class="mr-3"
       >
         <input 
           type="checkbox" 
@@ -43,7 +43,7 @@
         <!-- 表示モード -->
         <div
           v-else
-          class="flex items-start"
+          class="flex items-center"
         >
           <div class="flex-1">
             <div class="flex justify-between items-center">
