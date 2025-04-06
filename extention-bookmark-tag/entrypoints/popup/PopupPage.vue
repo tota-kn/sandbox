@@ -43,16 +43,17 @@
             </button>
           </TagBadge>
           
-          <!-- タグ追加ボタンを共通コンポーネントに置き換え -->
           <TagAddButton 
             :current-tags="currentTags"
             @add-tag="addTag"
           />
           
-          <EmptyStateMessage
+          <div  
             v-if="currentTags.length === 0"
-            message="No tags"
-          />
+            class="py-5 text-gray-500 italic"
+          >
+            No tags
+          </div>
         </div>
       </div>
       
@@ -67,7 +68,7 @@
         <!-- ブックマーク削除ボタン（追加済みの場合のみ表示） -->
         <button 
           v-if="currentBookmark"
-          class="bg-destructive hover:bg-destructive-hover text-destructive-foreground font-medium py-2 px-4 rounded-md"
+          class="flex-grow bg-destructive hover:bg-destructive-hover text-destructive-foreground font-medium py-2 px-4 rounded-md"
           title="Delete bookmark"
           @click="deleteBookmark"
         >
@@ -83,7 +84,6 @@ import { ref, computed, onMounted } from 'vue';
 import TagBadge from '../../components/TagBadge.vue';
 import TagAddButton from '../../components/TagAddButton.vue';
 import LoadingIndicator from '../../components/LoadingIndicator.vue';
-import EmptyStateMessage from '../../components/EmptyStateMessage.vue';
 import IconButton from '../../components/IconButton.vue';
 import { extractTags, removeTagFromTitle } from '../../utils/tagUtils';
 import { getCurrentTabBookmark, updateBookmark as updateBookmarkUtil, createBookmark as createBookmarkUtil, deleteBookmark as deleteBookmarkUtil } from '../../utils/bookmarkUtils';
