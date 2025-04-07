@@ -81,16 +81,15 @@
       v-if="showRemoveTagForm" 
       class="mt-2 p-2 bg-white rounded border border-gray-200"
     >
-      <div class="flex flex-wrap gap-2 mb-2">
-        <BaseButton
+      <div class="flex flex-wrap gap-2">
+        <TagBadge
           v-for="tag in allTagsInSelectedBookmarks"
           :key="tag"
-          variant="secondary"
-          size="sm"
-          @click="handleRemoveTag(tag)"
+          :tag="tag"
+          @toggle="handleRemoveTag(tag)"
         >
-          {{ tag }} ×
-        </BaseButton>
+          <span class="ml-1">×</span>
+        </TagBadge>
       </div>
       <div class="flex justify-end">
         <BaseButton 
@@ -215,13 +214,11 @@
           </p>
         </div>
         <div class="flex flex-wrap gap-1 ml-2">
-          <span 
+          <TagBadge 
             v-for="tag in extractTagsFromTitle(bookmark.title || '')" 
             :key="`${bookmark.id}-${tag}`"
-            class="px-2 py-0.5 bg-gray-200 text-gray-700 text-xs rounded"
-          >
-            {{ tag }}
-          </span>
+            :tag="tag"
+          />
         </div>
       </li>
     </ul>
@@ -233,7 +230,8 @@ import { ref, computed, nextTick, onMounted } from 'vue'
 import { ExtendedBookmark } from '../utils/bookmarkUtils'
 import { extractTags } from '../utils/tagUtils'
 import BaseButton from './BaseButton.vue'
-import IconButton from './IconButton.vue';
+import IconButton from './IconButton.vue'
+import TagBadge from './TagBadge.vue'
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
 
 
