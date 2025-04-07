@@ -1,7 +1,7 @@
 <template>
   <li>
     <div
-      class="flex items-center py-1 hover:bg-gray-50 rounded hover:text-primary cursor-pointer"
+      class="border-b border-border flex items-center py-2 hover:bg-gray-50 rounded hover:text-primary cursor-pointer"
       @click="$emit('toggle-folder-expanded', folder)"
     >
       <!-- フォルダ選択チェックボックス -->
@@ -55,6 +55,7 @@
       <BookmarkItem 
         v-for="bookmark in folderChildren.filter(b => !b.isFolder)"
         :key="bookmark.id"
+        class="border-b border-border"
         :bookmark="bookmark"
         :selectable="true"
         :selected="bookmark.selected || false"

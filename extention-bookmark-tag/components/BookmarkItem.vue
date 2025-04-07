@@ -1,5 +1,5 @@
 <template>
-  <li class="border-b last:border-b-0 py-2">
+  <li class="py-2">
     <div class="flex items-center">
       <!-- 選択チェックボックス -->
       <div
