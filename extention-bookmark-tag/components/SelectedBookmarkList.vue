@@ -86,9 +86,10 @@
           v-for="tag in allTagsInSelectedBookmarks"
           :key="tag"
           :tag="tag"
-          @toggle="handleRemoveTag(tag)"
         >
-          <span class="ml-1">×</span>
+          <IconButton @click="handleRemoveTag(tag)">
+            <XMarkIcon class="size-3" />
+          </IconButton>
         </TagBadge>
       </div>
       <div class="flex justify-end">
@@ -232,7 +233,7 @@ import { extractTags } from '../utils/tagUtils'
 import BaseButton from './BaseButton.vue'
 import IconButton from './IconButton.vue'
 import TagBadge from './TagBadge.vue'
-import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
+import { ChevronRightIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 
 /** コンポーネントのプロパーネントのプロパティ定義 */
