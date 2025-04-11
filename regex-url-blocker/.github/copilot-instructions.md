@@ -10,6 +10,7 @@
 - Vue 3: UIコンポーネント構築
 - Chrome Extension API: ブックマークの操作
 - Tailwind: スタイル指定
+- Vite: ビルド&テストツール
 
 ## ディレクトリ構成
 [WXTの標準に従う](https://wxt.dev/guide/essentials/project-structure.html#project-structure)ディレクトリ構成を採用しています。
@@ -42,3 +43,5 @@ pnpm dev
 # ビルド
 pnpm build
 ```
+
+# コーディングガイドライン「
