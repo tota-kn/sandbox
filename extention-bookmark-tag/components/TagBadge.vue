@@ -1,8 +1,8 @@
 <template>
-  <div 
+  <div
     :class="[
       'px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1',
-      selected 
+      selected
         ? 'bg-tag-selected-bg text-tag-selected-text border border-tag-selected-border'
         : 'bg-tag-default-bg text-tag-default-text border border-tag-default-border hover:bg-gray-200'
     ]"
@@ -20,10 +20,10 @@
       @click.stop
     >
     <span v-else>{{ displayTag }}</span>
-    <IconButton 
-      v-if="showEditButton && !isEditing" 
+    <IconButton
+      v-if="showEditButton && !isEditing"
       size="sm"
-      class="ml-1" 
+      class="ml-1"
       title="Edit tag"
       @click.stop="startEditing"
     >
@@ -36,10 +36,10 @@
 <script setup lang="ts">
 import { computed, ref, nextTick } from 'vue'
 import { removeTagPrefix, addTagPrefix } from '../utils/tagUtils'
-import { PencilSquareIcon} from '@heroicons/vue/24/outline'
+import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import IconButton from './IconButton.vue'
 
-/** 
+/**
  * コンポーネントのプロパティ定義
  */
 const props = defineProps<{
@@ -58,7 +58,7 @@ const emit = defineEmits<{
   /**
    * タグ選択切り替えイベント
    */
-  (e: 'toggle'): void,
+  (e: 'toggle'): void
   /**
    * タグ編集イベント
    * @param oldTag 元のタグ名
@@ -74,7 +74,7 @@ const editingValue = ref('')
 /** 入力フィールドへの参照 */
 const inputRef = ref<HTMLInputElement | null>(null)
 
-/** 
+/**
  * @マークを削除した表示用のタグ文字列
  */
 const displayTag = computed(() => {

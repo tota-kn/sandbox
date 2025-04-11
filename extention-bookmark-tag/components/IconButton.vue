@@ -19,11 +19,11 @@
  */
 interface Props {
   /** ボタンの無効状態 */
-  disabled?: boolean;
+  disabled?: boolean
   /** ボタンのタイプ属性 */
-  type?: 'button' | 'submit' | 'reset';
+  type?: 'button' | 'submit' | 'reset'
   /** ボタンのツールチップテキスト */
-  title?: string;
+  title?: string
 }
 
 /** デフォルト値の設定 */
@@ -31,5 +31,5 @@ withDefaults(defineProps<Props>(), {
   disabled: false,
   type: 'button',
   title: '',
-});
+})
 </script>

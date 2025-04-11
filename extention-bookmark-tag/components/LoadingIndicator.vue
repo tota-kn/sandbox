@@ -5,5 +5,6 @@
 </template>
 
 <script setup lang="ts">
+
 // プロパティの定義はなし（シンプルなローディング表示のみ）
 </script>

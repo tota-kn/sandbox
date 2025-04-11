@@ -6,40 +6,40 @@
         v-if="selectable"
         class="mr-3"
       >
-        <input 
-          type="checkbox" 
-          :checked="selected" 
+        <input
+          type="checkbox"
+          :checked="selected"
           class="h-4 w-4 text-primary focus:ring-primary-hover border-border rounded"
           @change="$emit('toggle-select')"
         >
       </div>
-      
+
       <div class="flex-1 min-w-0">
         <!-- 編集モード -->
         <div
           v-if="isEditing"
           class="flex items-center gap-2 mb-1"
         >
-          <input 
-            ref="titleInput" 
+          <input
+            ref="titleInput"
             v-model="editTitle"
             class="flex-1 px-2 py-1 border rounded text-sm"
             @keyup.enter="saveEdit"
           >
-          <button 
-            class="px-2 py-1 text-xs bg-primary text-primary-foreground rounded" 
+          <button
+            class="px-2 py-1 text-xs bg-primary text-primary-foreground rounded"
             @click="saveEdit"
           >
             保存
           </button>
-          <button 
-            class="px-2 py-1 text-xs bg-secondary hover:bg-secondary-hover rounded" 
+          <button
+            class="px-2 py-1 text-xs bg-secondary hover:bg-secondary-hover rounded"
             @click="cancelEdit"
           >
             キャンセル
           </button>
         </div>
-        
+
         <!-- 表示モード -->
         <div
           v-else
@@ -50,16 +50,16 @@
               <!-- タイトルとタグを左に配置 -->
               <div class="flex items-center gap-1 flex-wrap">
                 <h3 class="text-sm font-medium">
-                  <a 
-                    :href="bookmark.url" 
-                    target="_blank" 
+                  <a
+                    :href="bookmark.url"
+                    target="_blank"
                     rel="noopener noreferrer"
                     class="text-primary hover:text-primary-hover hover:underline"
                   >
                     {{ displayTitle }}
                   </a>
                 </h3>
-                
+
                 <!-- タグ -->
                 <div class="flex flex-wrap gap-1">
                   <TagBadge
@@ -69,14 +69,14 @@
                     size="small"
                   >
                     <IconButton
-                      class="ml-1" 
+                      class="ml-1"
                       title="Remove tag"
                       @click.stop="removeTag(tag)"
                     >
                       <XMarkIcon class="size-3" />
                     </IconButton>
                   </TagBadge>
-                  <TagAddButton 
+                  <TagAddButton
                     :current-tags="bookmarkTags"
                     @add-tag="addNewTag"
                   />
@@ -126,7 +126,7 @@ interface BookmarkProps {
 
 const props = withDefaults(defineProps<BookmarkProps>(), {
   selectable: false,
-  selected: false
+  selected: false,
 })
 
 /** 親コンポーネントに通知するイベント */
@@ -144,7 +144,7 @@ const editTitle = ref('')
 /** タイトル入力フィールドへの参照 */
 const titleInput = ref<HTMLInputElement | null>(null)
 
-/** 
+/**
  * タイトルからタグを除外した表示用タイトル
  */
 const displayTitle = computed(() => {
@@ -153,7 +153,7 @@ const displayTitle = computed(() => {
   return title.replace(/@\S+/g, '').trim()
 })
 
-/** 
+/**
  * ブックマークに含まれるタグの配列
  */
 const bookmarkTags = computed(() => {
@@ -167,7 +167,7 @@ const bookmarkTags = computed(() => {
 const startEdit = (): void => {
   editTitle.value = props.bookmark.title
   isEditing.value = true
-  
+
   // 入力フォームにフォーカス
   nextTick(() => {
     titleInput.value?.focus()
@@ -205,7 +205,7 @@ const addNewTag = (tag: string): void => {
   if (bookmarkTags.value.includes(tag)) {
     return
   }
-  
+
   // 現在のタイトルにタグを追加して更新
   const newTitle = `${props.bookmark.title} ${tag}`
   emit('update-title', newTitle)

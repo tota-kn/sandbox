@@ -1,26 +1,30 @@
 // @ts-check
 
-import eslintPluginVue from 'eslint-plugin-vue'
-import globals from 'globals'
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import pluginVue from 'eslint-plugin-vue'
+import { includeIgnoreFile } from '@eslint/compat'
+import eslint from '@eslint/js'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import tseslint from 'typescript-eslint'
+
 import stylistic from '@stylistic/eslint-plugin'
-import { includeIgnoreFile } from "@eslint/compat";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import unusedImports from "eslint-plugin-unused-imports";
+import globals from 'globals'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const gitignorePath = path.resolve(__dirname, ".gitignore");
+const gitIgnoreFileConfig = () => {
+  const fileName = fileURLToPath(import.meta.url)
+  const dirName = path.dirname(fileName)
+  const gitignorePath = path.resolve(dirName, '.gitignore')
+  return includeIgnoreFile(gitignorePath)
+}
 
-export default  tseslint.config(
-  includeIgnoreFile(gitignorePath),
+export default tseslint.config(
+  gitIgnoreFileConfig(),
   {
     extends: [
       eslint.configs.recommended,
       tseslint.configs.recommended,
-      ...eslintPluginVue.configs['flat/recommended'],
+      pluginVue.configs['flat/recommended'],
+      stylistic.configs.recommended,
     ],
     files: ['**/*.{js,ts,vue}'],
     languageOptions: {
@@ -32,21 +36,4 @@ export default  tseslint.config(
       },
     },
   },
-  {
-    plugins: {
-      '@stylistic': stylistic
-    },
-    rules: {
-      '@stylistic/indent': ['error', 2],
-    },
-  },
-  {
-    plugins: { 
-      "unused-imports": unusedImports
-    },
-    rules: {
-      "unused-imports/no-unused-vars": "error",
-      "unused-imports/no-unused-imports": "error",
-    },
-  }
 )

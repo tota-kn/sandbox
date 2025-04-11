@@ -3,16 +3,16 @@
     <h3 class="font-medium mb-2 text-tag-selected-text">
       Batch Tag Edit
     </h3>
-    
+
     <div class="flex flex-col gap-3">
       <!-- タグ追加 -->
       <div class="flex items-center gap-2">
-        <input 
-          v-model="tagToAdd" 
-          placeholder="Tag to add..." 
+        <input
+          v-model="tagToAdd"
+          placeholder="Tag to add..."
           class="px-3 py-2 border rounded flex-grow"
         >
-        <button 
+        <button
           :disabled="!tagToAdd || selectedCount === 0"
           class="px-4 py-2 bg-primary text-primary-foreground rounded disabled:opacity-50"
           @click="addTag"
@@ -20,15 +20,15 @@
           Add Tag
         </button>
       </div>
-      
+
       <!-- タグ削除 -->
       <div class="flex items-center gap-2">
-        <input 
-          v-model="tagToRemove" 
-          placeholder="Tag to remove..." 
+        <input
+          v-model="tagToRemove"
+          placeholder="Tag to remove..."
           class="px-3 py-2 border rounded flex-grow"
         >
-        <button 
+        <button
           :disabled="!tagToRemove || selectedCount === 0"
           class="px-4 py-2 bg-destructive text-destructive-foreground rounded disabled:opacity-50"
           @click="removeTag"
@@ -59,7 +59,7 @@ const emit = defineEmits<{
    * タグ追加イベント
    * @param tag 追加するタグ
    */
-  (e: 'add-tag', tag: string): void,
+  (e: 'add-tag', tag: string): void
   /**
    * タグ削除イベント
    * @param tag 削除するタグ

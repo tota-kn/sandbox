@@ -32,17 +32,17 @@ const props = defineProps<{
  */
 const rootItems = computed(() => {
   // まず親IDがないか'0'のアイテムを探す（主要なルート）
-  const mainRoot = props.bookmarks.find(b => !b.parentId || b.parentId === '0');
-  
+  const mainRoot = props.bookmarks.find(b => !b.parentId || b.parentId === '0')
+
   if (mainRoot) {
     // 最初に見つかったルートIDを使用
-    return props.bookmarks.filter(b => b.parentId === mainRoot.parentId);
+    return props.bookmarks.filter(b => b.parentId === mainRoot.parentId)
   }
-  
+
   // バックアップとして従来のロジック（ID '1'も含む）
-  return props.bookmarks.filter(b => 
-    !b.parentId || b.parentId === '0' || b.parentId === '1'
-  );
+  return props.bookmarks.filter(b =>
+    !b.parentId || b.parentId === '0' || b.parentId === '1',
+  )
 })
 
 /**

@@ -17,25 +17,25 @@
         <span>{{ bookmarks.length }} bookmarks selected</span>
       </div>
       <div class="flex space-x-2">
-        <BaseButton 
+        <BaseButton
           variant="primary"
           @click.stop="toggleAddTagForm"
         >
           Add tag
         </BaseButton>
-        <BaseButton 
+        <BaseButton
           variant="destructive"
           @click.stop="toggleRemoveTagForm"
         >
           Remove tag
         </BaseButton>
-        <BaseButton 
+        <BaseButton
           variant="secondary"
           @click.stop="toggleFolderMoveForm"
         >
           Move
         </BaseButton>
-        <BaseButton 
+        <BaseButton
           variant="link"
           @click.stop="clearAllSelections"
         >
@@ -43,14 +43,14 @@
         </BaseButton>
       </div>
     </div>
-    
+
     <!-- タグ追加フォーム (インライン) -->
-    <div 
-      v-if="showAddTagForm" 
+    <div
+      v-if="showAddTagForm"
       class="mt-2 p-2 bg-white rounded border border-gray-200"
     >
       <div class="flex items-center">
-        <input 
+        <input
           ref="addTagInput"
           v-model="tagInput"
           type="text"
@@ -58,14 +58,14 @@
           placeholder="Enter tag name (without @)"
           @keyup.enter="handleAddTag"
         >
-        <BaseButton 
+        <BaseButton
           variant="primary"
           size="sm"
           @click="handleAddTag"
         >
           Add
         </BaseButton>
-        <BaseButton 
+        <BaseButton
           variant="secondary"
           size="sm"
           class-name="ml-2"
@@ -75,10 +75,10 @@
         </BaseButton>
       </div>
     </div>
-    
+
     <!-- タグ削除フォーム (インライン) -->
-    <div 
-      v-if="showRemoveTagForm" 
+    <div
+      v-if="showRemoveTagForm"
       class="mt-2 p-2 bg-white rounded border border-gray-200"
     >
       <div class="flex flex-wrap gap-2">
@@ -93,7 +93,7 @@
         </TagBadge>
       </div>
       <div class="flex justify-end">
-        <BaseButton 
+        <BaseButton
           variant="secondary"
           size="sm"
           @click="cancelTagForm"
@@ -104,8 +104,8 @@
     </div>
 
     <!-- フォルダ移動フォーム (インライン) -->
-    <div 
-      v-if="showFolderMoveForm" 
+    <div
+      v-if="showFolderMoveForm"
       class="mt-2 p-2 bg-white rounded border border-gray-200"
     >
       <div class="mb-2">
@@ -114,12 +114,12 @@
             <label class="block text-sm font-medium text-gray-700">移動先フォルダ</label>
             <div class="flex flex-col max-h-60 overflow-y-auto border border-gray-200 rounded p-2 mt-1">
               <!-- フォルダ選択リスト -->
-              <div 
+              <div
                 v-if="folderList.length > 0"
                 class="space-y-1"
               >
-                <div 
-                  v-for="folder in folderList" 
+                <div
+                  v-for="folder in folderList"
                   :key="folder.id"
                   class="flex items-center hover:bg-gray-100 p-1 rounded cursor-pointer"
                   @click="selectFolder(folder)"
@@ -141,7 +141,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 新規フォルダ作成フォーム -->
           <div class="mb-2">
             <div class="flex items-center">
@@ -161,7 +161,7 @@
               </BaseButton>
             </div>
           </div>
-          
+
           <!-- 選択中のフォルダ表示 -->
           <div
             v-if="selectedFolder"
@@ -171,7 +171,7 @@
               選択中: <span class="font-medium">{{ selectedFolder.title }}</span>
             </p>
           </div>
-          
+
           <div class="flex justify-end">
             <BaseButton
               variant="secondary"
@@ -198,15 +198,15 @@
       v-if="expanded"
       class="space-y-2 mt-2"
     >
-      <li 
-        v-for="bookmark in bookmarks" 
+      <li
+        v-for="bookmark in bookmarks"
         :key="bookmark.id"
         class="flex items-center justify-between bg-white p-2 rounded border border-gray-200"
       >
         <div class="flex items-center flex-grow">
-          <input 
-            type="checkbox"                                               
-            :checked="bookmark.selected" 
+          <input
+            type="checkbox"
+            :checked="bookmark.selected"
             class="mr-2"
             @change="handleToggleBookmark(bookmark)"
           >
@@ -215,8 +215,8 @@
           </p>
         </div>
         <div class="flex flex-wrap gap-1 ml-2">
-          <TagBadge 
-            v-for="tag in extractTagsFromTitle(bookmark.title || '')" 
+          <TagBadge
+            v-for="tag in extractTagsFromTitle(bookmark.title || '')"
             :key="`${bookmark.id}-${tag}`"
             :tag="tag"
           />
@@ -234,7 +234,6 @@ import BaseButton from './BaseButton.vue'
 import IconButton from './IconButton.vue'
 import TagBadge from './TagBadge.vue'
 import { ChevronRightIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-
 
 /** コンポーネントのプロパーネントのプロパティ定義 */
 const props = defineProps<{
@@ -269,9 +268,9 @@ const tagInput = ref('')
 /** タグ入力フィールドへの参照 */
 const addTagInput = ref<HTMLInputElement | null>(null)
 /** フォルダリスト */
-const folderList = ref<Array<{id: string, title: string, depth: number}>>([])
+const folderList = ref<Array<{ id: string, title: string, depth: number }>>([])
 /** 選択中のフォルダ */
-const selectedFolder = ref<{id: string, title: string, depth: number} | null>(null)
+const selectedFolder = ref<{ id: string, title: string, depth: number } | null>(null)
 /** 新規フォルダ名 */
 const newFolderName = ref('')
 
@@ -290,7 +289,7 @@ const extractTagsFromTitle = (title: string): string[] => {
 const allTagsInSelectedBookmarks = computed((): string[] => {
   const allTags = props.bookmarks
     .flatMap(bookmark => extractTags(bookmark.title || ''))
-  
+
   // 重複を削除
   return [...new Set(allTags)]
 })
@@ -331,7 +330,8 @@ const toggleAddTagForm = (): void => {
     nextTick(() => {
       addTagInput.value?.focus()
     })
-  } else {
+  }
+  else {
     showAddTagForm.value = false
   }
   event?.stopPropagation()
@@ -347,7 +347,8 @@ const toggleRemoveTagForm = (): void => {
     showFolderMoveForm.value = false
     showRemoveTagForm.value = true
     expanded.value = true // リストも自動的に展開する
-  } else {
+  }
+  else {
     showRemoveTagForm.value = false
   }
   event?.stopPropagation()
@@ -364,7 +365,8 @@ const toggleFolderMoveForm = (): void => {
     showFolderMoveForm.value = true
     expanded.value = true // リストも自動的に展開する
     loadFolders() // フォルダ一覧を読み込む
-  } else {
+  }
+  else {
     showFolderMoveForm.value = false
   }
   event?.stopPropagation()
@@ -399,7 +401,7 @@ const handleAddTag = (): void => {
   // @マークを自動的に付与せずにタグ名をそのまま渡す
   // （親コンポーネント側で@付与するか判断）
   emit('add-tag', tagInput.value.trim())
-  
+
   // フォームを閉じて入力をクリア
   cancelTagForm()
 }
@@ -410,9 +412,9 @@ const handleAddTag = (): void => {
  */
 const handleRemoveTag = (tag: string): void => {
   if (!tag) return
-  
+
   emit('remove-tag', tag)
-  
+
   // 削除後も削除フォームを表示したままにする
   // ユーザーが複数のタグを削除できるようにするため
 }
@@ -425,14 +427,14 @@ const loadFolders = async (): Promise<void> => {
   try {
     // フォルダ一覧をクリア
     folderList.value = []
-    
+
     // Chrome拡張のブックマークAPIを使用してフォルダツリーを取得
     const bookmarkTree = await chrome.bookmarks.getTree()
-    
+
     // ツリーを平坦化してフォルダのみを抽出
     processFolders(bookmarkTree[0], 0)
-    
-  } catch (error) {
+  }
+  catch (error) {
     console.error('フォルダの取得に失敗しました:', error)
   }
 }
@@ -450,10 +452,10 @@ const processFolders = (node: chrome.bookmarks.BookmarkTreeNode, depth: number):
       folderList.value.push({
         id: node.id,
         title: node.title || 'フォルダ',
-        depth: depth
+        depth: depth,
       })
     }
-    
+
     // 子ノードを再帰的に処理
     if (node.children) {
       for (const child of node.children) {
@@ -467,7 +469,7 @@ const processFolders = (node: chrome.bookmarks.BookmarkTreeNode, depth: number):
  * フォルダを選択する
  * @param {Object} folder 選択するフォルダ情報
  */
-const selectFolder = (folder: {id: string, title: string, depth: number}): void => {
+const selectFolder = (folder: { id: string, title: string, depth: number }): void => {
   selectedFolder.value = folder
 }
 
@@ -477,31 +479,31 @@ const selectFolder = (folder: {id: string, title: string, depth: number}): void 
  */
 const createAndSelectFolder = async (): Promise<void> => {
   if (!newFolderName.value.trim()) return
-  
+
   try {
     // Chrome拡張のブックマークAPIを使用して新規フォルダを作成
     // 親フォルダが選択されている場合はその中に作成、そうでなければルートに作成
     const parentId = selectedFolder.value?.id || '1' // デフォルトはルートフォルダ
-    
+
     const newFolder = await chrome.bookmarks.create({
       parentId,
       title: newFolderName.value.trim(),
     })
-    
+
     // 作成したフォルダを選択状態にする
     selectFolder({
       id: newFolder.id,
       title: newFolder.title || '新規フォルダ',
-      depth: selectedFolder.value ? selectedFolder.value.depth + 1 : 0
+      depth: selectedFolder.value ? selectedFolder.value.depth + 1 : 0,
     })
-    
+
     // 作成後はフォルダ一覧を再読み込み
     await loadFolders()
-    
+
     // 入力をクリア
     newFolderName.value = ''
-    
-  } catch (error) {
+  }
+  catch (error) {
     console.error('フォルダの作成に失敗しました:', error)
     alert('フォルダの作成に失敗しました')
   }
@@ -512,10 +514,10 @@ const createAndSelectFolder = async (): Promise<void> => {
  */
 const handleMoveBookmarks = (): void => {
   if (!selectedFolder.value) return
-  
+
   // 親コンポーネントに移動イベントを発行
   emit('move-bookmarks', selectedFolder.value.id)
-  
+
   // フォームをクリア
   cancelFolderMoveForm()
 }
